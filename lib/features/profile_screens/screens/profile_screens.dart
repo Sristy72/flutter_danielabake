@@ -30,14 +30,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
             return const CircularProgressIndicator(); // Loading state
           }
 
-          return ProfileCard(
-            name: user.fullName,
-            imagePath: user.avatarUrl,
-            orders: user.totalOrders.toString(),
-            favorites: user.totalFavorites.toString(),
-            onEdit: () {
-              print('Edit clicked');
-            },
+          return SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ProfileCard(
+                name: user.fullName,
+                imagePath: user.avatarUrl,
+                orders: user.totalOrders.toString(),
+                favorites: user.totalFavorites.toString(),
+                onEdit: () {
+                  print('Edit clicked');
+                },
+              ),
+            ),
           );
         }),
       ),

@@ -1,3 +1,4 @@
+import 'package:danielabake/features/Order_screen/controller/order_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../home/controller/cart_controller.dart';
@@ -15,7 +16,7 @@ class CheckoutCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // inside CheckoutCard widget
-    final AddToCartController controller = Get.find<AddToCartController>();
+    final OrderController controller = Get.find<OrderController>();
 
     quantity.value = cartItem.quantity;
 

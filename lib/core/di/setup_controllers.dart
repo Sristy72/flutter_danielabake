@@ -16,7 +16,7 @@ void setupControllers() {
   Get.getOrPut(() => CategoryController());
   Get.getOrPut(() => HomeController());
   Get.getOrPut(() => FavoriteFoodController());
-  Get.getOrPut(() => AddToCartController());
+  // Get.getOrPut(() => AddToCartController());
   Get.getOrPut(() => OrderController());
   Get.getOrPut(() => MessageController());
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../home/controller/cart_controller.dart';
+import '../controller/order_controller.dart';
 import '../models/response/get_cart_response_model.dart';
 
 class CartItemCard extends StatelessWidget {
@@ -15,7 +16,7 @@ class CartItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     quantity.value = cartItem.quantity;
-    final AddToCartController controller = Get.find<AddToCartController>();
+    final OrderController controller = Get.find<OrderController>();
 
     final item = cartItem.item;
     final price = item.price;

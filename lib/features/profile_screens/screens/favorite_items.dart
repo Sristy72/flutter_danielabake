@@ -13,8 +13,7 @@ class FavoriteItems extends StatefulWidget {
 }
 
 class _FavoriteItemsState extends State<FavoriteItems> {
-  final _favoriteFoodController = Get.put(ProfileController());
-  final _favoriteController = Get.put(FavoriteFoodController());
+  final _favoriteFoodController = Get.put(FavoriteFoodController());
 
   @override
   void initState() {
@@ -105,8 +104,8 @@ class _FavoriteItemsState extends State<FavoriteItems> {
                     onAdd: () => print('Add ${food.name}'),
                     onFavoriteToggle: (val) async {
                       if (!val) {
-                        items.removeAt(index); // instantly update UI
-                        await _favoriteController.removeFavorite(food.id);
+                        await _favoriteFoodController.removeFavorite(food.id);
+                        // ← That's it! The controller already removes it from RxList → UI updates instantly
                       }
                     },
                   );

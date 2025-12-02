@@ -20,7 +20,6 @@ class FoodDetailScreen extends StatefulWidget {
 }
 
 class _FoodDetailScreenState extends State<FoodDetailScreen> {
-  final _cartController = Get.find<AddToCartController>();
   final _orderController = Get.find<OrderController>();
 
   final RxInt quantity = 0.obs;
@@ -75,7 +74,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                             if (quantity.value <= 0) return;
 
                             quantity.value--;
-                            _cartController.removeOneItemFromCart(widget.food.id);
+                            _orderController.removeOneItemFromCart(widget.food.id);
             
                             /// refresh cart after removing
                             _orderController.fetchCart();
@@ -93,7 +92,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                             quantity.value++;
             
                             /// call add API
-                            _cartController.addCart(widget.food.id, 1);
+                            _orderController.addCart(widget.food.id, 1);
             
                             /// refresh cart after adding
                             _orderController.fetchCart();
@@ -123,9 +122,11 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
             /// Food Image
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(15),
-                child: Image.network(widget.food.image),
+              child: Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: Image.network(widget.food.image),
+                ),
               ),
             ),
 

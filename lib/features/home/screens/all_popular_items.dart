@@ -5,6 +5,7 @@ import 'package:danielabake/features/home/controller/favorite_food_controller.da
 import 'package:danielabake/features/home/controller/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../Order_screen/controller/order_controller.dart';
 import '../controller/cart_controller.dart';
 import '../widgets/models/detail_food_model.dart';
 import '../widgets/popular_items.dart';
@@ -20,7 +21,7 @@ class AllPopularItems extends StatefulWidget {
 class _AllPopularItemsState extends State<AllPopularItems> {
   final _homeController = Get.find<HomeController>();
   final _favoriteFoodController = Get.find<FavoriteFoodController>();
-  final _cartController = Get.find<AddToCartController>();
+  final _cartController = Get.find<OrderController>();
 
   final TextEditingController _searchController = TextEditingController();
   final RxBool _isSearching = false.obs;
@@ -38,14 +39,16 @@ class _AllPopularItemsState extends State<AllPopularItems> {
       appBar: AppBar(
         centerTitle: true,
         elevation: 0,
-        title: const Text(
+        title: Obx(() => _isSearchExpanded.value
+            ? const SizedBox() // Hide title when searching
+            : const Text(
           'Popular Items',
           style: TextStyle(
             fontSize: 19,
             fontWeight: FontWeight.w600,
             color: Colors.black,
           ),
-        ),
+        )),
         actions: [
           Padding(
             padding: EdgeInsets.only(right: screenW * 0.04),
@@ -63,11 +66,13 @@ class _AllPopularItemsState extends State<AllPopularItems> {
               onClear: () {
                 _searchController.clear();
                 _isSearching.value = false;
+                _isSearchExpanded.value = false; // collapse
               },
             ),
           ),
         ],
       ),
+
       body: SafeArea(
         child: Obx(() {
           final bool searching = _isSearching.value;
@@ -91,7 +96,6 @@ class _AllPopularItemsState extends State<AllPopularItems> {
           return GridView.builder(
             padding: EdgeInsets.symmetric(
               vertical: screenH * 0.015,
-              horizontal: screenW * 0.04,
             ),
             physics: const BouncingScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(

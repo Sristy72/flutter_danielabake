@@ -12,9 +12,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../core/common/widgets/cart.dart';
+import '../../Order_screen/controller/order_controller.dart';
 import '../widgets/grid_layout.dart';
 import '../widgets/models/detail_food_model.dart';
 import '../widgets/popular_items.dart';
+import '../widgets/responsive.dart';
 import 'food_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -27,12 +29,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _homeController = Get.find<HomeController>();
   final _favoriteFoodController = Get.find<FavoriteFoodController>();
-  final _cartController = Get.find<AddToCartController>();
+  final _cartController = Get.find<OrderController>();
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -56,13 +56,13 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: screenHeight * 0.02),
+              SizedBox(height: rw(context, 0.03)),
 
-              /// 🔥 Responsive Discount Banner
+              /// Responsive Banner
               GestureDetector(
                 onTap: () {},
                 child: SizedBox(
-                  height: screenHeight * 0.24, // Responsive height
+                  height: rw(context, 0.50), // FIXED for all screens
                   width: double.infinity,
                   child: Image.asset(
                     Images.discount,
@@ -71,26 +71,24 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              SizedBox(height: screenHeight * 0.02),
+              SizedBox(height: rw(context, 0.03)),
 
               TextWithViewAllButton(
-                  text: 'Select by Category',
-                  onTap: () {
-                    Get.to(() => AllCategoryScreen());
-                  }),
+                text: 'Select by Category',
+                onTap: () => Get.to(() => AllCategoryScreen()),
+              ),
               CategorySection(),
 
-              SizedBox(height: screenHeight * 0.03),
+              SizedBox(height: rw(context, 0.05)),
 
               TextWithViewAllButton(
-                  text: 'Popular Item',
-                  onTap: () {
-                    Get.to(() => AllPopularItems());
-                  }),
+                text: 'Popular Item',
+                onTap: () => Get.to(() => AllPopularItems()),
+              ),
 
-              SizedBox(height: screenHeight * 0.015),
+              SizedBox(height: rw(context, 0.03)),
 
-              // Popular items grid
+              /// Popular Items Grid
               Obx(() {
                 final data = _homeController.popularItem.value;
 
@@ -99,12 +97,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 }
 
                 return GridLayout(
-                  mainAxisExtent: MediaQuery.of(context).size.height * 0.30, // smaller height
+                  mainAxisExtent: rh(context, 0.30), // fixed for all screens
                   itemCount: data.items.length,
                   itemBuilder: (_, index) {
                     final item = data.items[index];
                     final isFavorite = false.obs;
-
 
                     return GestureDetector(
                       onTap: () {
@@ -115,7 +112,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             image: item.image,
                             ingredients: item.ingredients
                                 .map((e) => e.name)
-                                .toList(), price: item.price.toString(), id: item.id,
+                                .toList(),
+                            price: item.price.toString(),
+                            id: item.id,
                           ),
                         ));
                       },
@@ -131,7 +130,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             await _cartController.addCart(item.id, 1);
                             Get.snackbar('Success', '${item.name} added to cart');
                           } catch (e) {
-                            Get.snackbar('Error', 'Failed to add ${item.name} to cart');
+                            Get.snackbar(
+                                'Error', 'Failed to add ${item.name} to cart');
                           }
                         },
                         onFavoriteToggle: (newValue) async {
@@ -140,20 +140,21 @@ class _HomeScreenState extends State<HomeScreen> {
                               await _favoriteFoodController.favorite(item.id);
                               isFavorite.value = true;
                             } else {
-                              await _favoriteFoodController.removeFavorite(item.id);
+                              await _favoriteFoodController
+                                  .removeFavorite(item.id);
                               isFavorite.value = false;
                             }
                           } catch (e) {
                             DPrint.log("Favorite toggle error: $e");
                           }
                         },
-                      )
+                      ),
                     );
                   },
                 );
               }),
 
-              SizedBox(height: screenHeight * 0.03),
+              SizedBox(height: rw(context, 0.05)),
             ],
           ),
         ),

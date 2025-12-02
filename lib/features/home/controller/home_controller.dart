@@ -13,12 +13,16 @@ class HomeController extends BaseController {
   final _searchRepository = Get.find<SearchRepository>();
   final AuthStorageService _authStorageService = AuthStorageService();
 
-  final Rxn<GetCategoryResponseModel> category =
-  Rxn<GetCategoryResponseModel>();
+  // Category
+  final Rxn<GetCategoryResponseModel> category = Rxn<GetCategoryResponseModel>();
 
-  final Rxn<GetPopularItemResponseModel> popularItem = Rxn<GetPopularItemResponseModel>();
-  final Rxn<GetPopularItemResponseModel> search = Rxn<GetPopularItemResponseModel>();
-  // final MultiFormDataManager _multiFormDataManager = MultiFormDataManager();
+  // Popular items (default list)
+  final Rxn<GetPopularItemResponseModel> popularItem =
+  Rxn<GetPopularItemResponseModel>();
+
+  // Search results
+  final Rxn<GetPopularItemResponseModel> search =
+  Rxn<GetPopularItemResponseModel>();
 
   @override
   void onInit() {
@@ -26,35 +30,66 @@ class HomeController extends BaseController {
     fetchPopularItem();
   }
 
+  /// Fetch popular items (shown by default)
   Future<void> fetchPopularItem() async {
+    setLoading(true); // optional: use if BaseController has setLoading
 
     final result = await _homeRepository.fetchPopularItems();
 
     result.fold(
           (fail) {
         setError(fail.message);
-        DPrint.log('data fetch failed');
+        DPrint.log('Popular items fetch failed: ${fail.message}');
       },
           (success) {
         popularItem.value = success.data;
-        DPrint.log(success.message);
+        DPrint.log('Popular items loaded: ${success.message}');
       },
     );
+
+    setLoading(false);
   }
 
+  /// Search items by keyword
   Future<void> searchItem(String text) async {
+    if (text.trim().isEmpty) {
+      clearSearch();
+      return;
+    }
 
-    final result = await _searchRepository.searchItem(text);
+    setLoading(true);
+
+    final result = await _searchRepository.searchItem(text.trim());
 
     result.fold(
           (fail) {
         setError(fail.message);
-        DPrint.log('data fetch failed');
+        DPrint.log('Search failed: ${fail.message}');
+        search.value = null; // clear previous results on error
       },
           (success) {
         search.value = success.data;
-        DPrint.log(success.message);
+        DPrint.log('Search success: ${success.message}');
       },
     );
+
+    setLoading(false);
+  }
+
+  /// Clear search results and go back to showing popular items
+  void clearSearch() {
+    search.value = null;
+    update(); // Optional: if you use GetBuilder anywhere
+  }
+
+  /// Optional: Reload popular items (e.g., pull-to-refresh)
+  Future<void> refreshPopularItems() async {
+    await fetchPopularItem();
+  }
+
+  @override
+  void onClose() {
+    // Clean up if needed
+    super.onClose();
   }
 }
