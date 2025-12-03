@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutx_core/flutx_core.dart';
 import 'package:get/get.dart';
 import '../../../core/theme/app_colors.dart';
+import 'login_screen.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -57,11 +58,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
 
     // Pass data to AuthController (you can extend AuthController to handle signup)
-    await _authCtrl.signUp(
-      name: _nameController.text.trim(),
-      email: _emailController.text.trim(),
-      password: _passwordController.text,
-    );
+
+    await _authCtrl.register(_nameController.text.trim(), _emailController.text.trim(), _passwordController.text);
   }
 
   @override
@@ -224,19 +222,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         child: RichText(
                           text: TextSpan(
                             text: 'Already have an account? ',
-                            style: const TextStyle(
-                              color: AppColors.primaryBlack,
+                            style: TextStyle(
+                                color: Colors.black, // normal text color
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400
                             ),
                             children: [
                               TextSpan(
                                 text: 'Login',
-                                style: const TextStyle(
-                                  color: AppColors.primaryButtonBright,
-                                  fontWeight: FontWeight.bold,
+                                style: TextStyle(
+                                    color: Color(0xFF1753FF), // login text color
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14
                                 ),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
-                                    Get.back();
+                                    Get.to(() => LoginScreen());
                                   },
                               ),
                             ],

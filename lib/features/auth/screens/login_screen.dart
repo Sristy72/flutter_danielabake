@@ -4,7 +4,10 @@ import 'package:danielabake/core/common/widgets/button_widgets.dart';
 import 'package:danielabake/core/extensions/input_decoration_extensions.dart';
 
 import 'package:danielabake/features/auth/controller/auth_controller.dart';
+import 'package:danielabake/features/auth/screens/forgot_password_screen.dart';
 import 'package:danielabake/features/auth/screens/signup_screen.dart';
+import 'package:danielabake/features/home/screens/home_screen.dart';
+import 'package:danielabake/navigation_menu.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutx_core/flutx_core.dart';
@@ -12,9 +15,12 @@ import 'package:flutx_core/flutx_core.dart';
 import 'package:get/get.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../controller/remember_me_controller.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  const LoginScreen({super.key,  this.password,  this.email});
+  final String? password;
+  final String? email;
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -30,9 +36,18 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
 
   final ValueNotifier<bool> _obscurePassword = ValueNotifier<bool>(true);
-  final ValueNotifier<bool> _rememberMe = ValueNotifier<bool>(false);
+  final rememberMeController = Get.put(RememberMeController());
 
   final _authCtrl = Get.find<AuthController>();
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.text = widget.email ?? '';
+    _passwordController.text = widget.password ?? '';
+  }
+
+
 
   @override
   void dispose() {
@@ -43,8 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    await _authCtrl.login();
-    // Get.to(() => ChangePasswordScreen());
+    await _authCtrl.login(rememberMeController, email: _emailController.text, password: _passwordController.text);
   }
 
   @override
@@ -129,24 +143,44 @@ class _LoginScreenState extends State<LoginScreen> {
                       Gap.h12,
                       Row(
                         children: [
-                          ValueListenableBuilder<bool>(
-                            valueListenable: _rememberMe,
-                            builder: (context, remember, _) {
-                              return Checkbox(
-                                side: BorderSide(
-                                  color: AppColors.primaryButtonBright,
-                                ),
-                                value: remember,
-                                onChanged: (value) {
-                                  _rememberMe.value = value ?? false;
-                                },
-                              );
-                            },
+                          Obx(
+                                () => Checkbox(
+                              value:
+                              rememberMeController.rememberMe.value,
+                              activeColor: Colors.white,
+                              checkColor: Colors.black,
+                              //  tick color
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              side: WidgetStateBorderSide.resolveWith((
+                                  states,
+                                  ) {
+                                if (states.contains(
+                                  WidgetState.selected,
+                                )) {
+                                  //  Border when checked
+                                  return BorderSide(
+                                    color: Color(0xFF1753FF),
+                                    width: 2,
+                                  );
+                                }
+                                // Border when unchecked
+                                return BorderSide(
+                                  color: Color(0xFF1753FF),
+                                  width: 1,
+                                );
+                              }),
+                              onChanged: (_) =>
+                                  rememberMeController.toggleRememberMe(),
+                            ),
                           ),
+                          
+                          
                           Text("Remember me", style: TextStyle(fontSize: 14)),
                           Spacer(),
                           TextButton(
-                            onPressed: () {},
+                            onPressed: () {Get.to(() => ForgotPasswordScreen());},
                             child: Text(
                               "Forgot password?",
                               style: TextStyle(

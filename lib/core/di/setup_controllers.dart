@@ -1,7 +1,22 @@
 import 'package:danielabake/core/utils/getx_helper.dart';
+import 'package:danielabake/features/Order_screen/controller/order_controller.dart';
 import 'package:danielabake/features/auth/controller/auth_controller.dart';
+import 'package:danielabake/features/home/controller/cart_controller.dart';
+import 'package:danielabake/features/home/controller/category_controller.dart';
+import 'package:danielabake/features/home/controller/favorite_food_controller.dart';
+import 'package:danielabake/features/home/controller/home_controller.dart';
+import 'package:danielabake/features/profile_screens/controller/profile_controller.dart';
 import 'package:get/get.dart';
+
+import '../../features/chat_screen/controller/message_controller.dart';
 
 void setupControllers() {
   Get.getOrPut(() => AuthController());
+  Get.getOrPut(() => ProfileController());
+  Get.getOrPut(() => CategoryController());
+  Get.getOrPut(() => HomeController());
+  Get.getOrPut(() => FavoriteFoodController());
+  Get.getOrPut(() => AddToCartController());
+  Get.getOrPut(() => OrderController());
+  Get.getOrPut(() => MessageController());
 }
