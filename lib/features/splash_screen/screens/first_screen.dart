@@ -43,21 +43,21 @@ class FirstScreen extends StatelessWidget {
                 ],
               ),
             ),
-            Positioned(
-              top: size.height * 0.32,
-              left: -70,
-              child: _buildDiamondImage(Images.cookie1, 160),
-            ),
-            Positioned(
-              top: size.height * 0.38,
-              left: 120,
-              child: _buildDiamondImage(Images.cookie2, 199),
-            ),
-            Positioned(
-              top: size.height * 0.32,
-              right: -70,
-              child: _buildDiamondImage(Images.cookie3, 160),
-            ),
+            // Positioned(
+            //   top: size.height * 0.32,
+            //   left: -70,
+            //   child: _buildDiamondImage(Images.cookie1, 160),
+            // ),
+            // Positioned(
+            //   top: size.height * 0.38,
+            //   left: 120,
+            //   child: _buildDiamondImage(Images.cookie2, 199),
+            // ),
+            // Positioned(
+            //   top: size.height * 0.32,
+            //   right: -70,
+            //   child: _buildDiamondImage(Images.cookie3, 160),
+            // ),
 
             Positioned(
               bottom: 120,

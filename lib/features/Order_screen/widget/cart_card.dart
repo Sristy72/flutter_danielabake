@@ -182,7 +182,7 @@ class CartItemCard extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 8.0),
             child: GestureDetector(
               onTap: () {
-                controller.removeCart(item.id);
+                controller.removeCart(cartItem.item.id); // This now removes instantly!
               },
               child: Container(
                 padding: const EdgeInsets.all(4),

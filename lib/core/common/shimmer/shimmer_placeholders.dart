@@ -1,8 +1,7 @@
+// shimmer_placeholders.dart  ← FINAL WORKING VERSION
 import 'package:flutter/material.dart';
-import 'shimmer_loader.dart';
 
 class ShimmerPlaceholders {
-  // Rectangle placeholder
   static Widget rectangle({
     double width = double.infinity,
     double height = double.infinity,
@@ -12,35 +11,28 @@ class ShimmerPlaceholders {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        color: Colors.grey,
+        color: Colors.grey.shade200, // ← THIS IS THE KEY
         borderRadius: BorderRadius.circular(borderRadius),
       ),
     );
   }
 
-  // Circle placeholder
-  static Widget circle({double size = 48}) {
+  static Widget circle({double diameter = 48}) {
     return Container(
-      width: size,
-      height: size,
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      width: diameter,
+      height: diameter,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200, // ← Also change this
         shape: BoxShape.circle,
       ),
     );
   }
 
-  // Text line placeholder
   static Widget textLine({
     double width = double.infinity,
     double height = 12,
     double borderRadius = 4,
   }) {
     return rectangle(width: width, height: height, borderRadius: borderRadius);
-  }
-
-  // Custom child with shimmer
-  static Widget custom({required Widget child, bool isLoading = true}) {
-    return ShimmerLoader(isLoading: isLoading, child: child);
   }
 }

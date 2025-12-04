@@ -97,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 }
 
                 return GridLayout(
-                  mainAxisExtent: rh(context, 0.30), // fixed for all screens
+                  // mainAxisExtent: MediaQuery.of(context).size.height * 0.30, // smaller height
                   itemCount: data.items.length,
                   itemBuilder: (_, index) {
                     final item = data.items[index];

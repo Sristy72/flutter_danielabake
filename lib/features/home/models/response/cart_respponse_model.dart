@@ -1,53 +1,75 @@
 class OrderResponse {
-  final String id;
-  final String userId;
-  final List<OrderItem> items;
-  final double total;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  final int v;
+  final String? id;
+  final String? user;
+  final List<CartItem>? items;
+  final num? total;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final int? v;
 
   OrderResponse({
-    required this.id,
-    required this.userId,
-    required this.items,
-    required this.total,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.v,
+    this.id,
+    this.user,
+    this.items,
+    this.total,
+    this.createdAt,
+    this.updatedAt,
+    this.v,
   });
 
   factory OrderResponse.fromJson(Map<String, dynamic> json) {
     return OrderResponse(
       id: json['_id'],
-      userId: json['user'],
-      items: (json['items'] as List)
-          .map((item) => OrderItem.fromJson(item))
-          .toList(),
-      total: json['total'] as double,
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      user: json['user'],
+      items: json['items'] != null
+          ? List<CartItem>.from(json['items'].map((x) => CartItem.fromJson(x)))
+          : [],
+      total: json['total'],
+      createdAt:
+      json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
+      updatedAt:
+      json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
       v: json['__v'],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '_id': id,
+      'user': user,
+      'items': items?.map((x) => x.toJson()).toList(),
+      'total': total,
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
+      '__v': v,
+    };
+  }
 }
 
-class OrderItem {
-  final String itemId;
-  final int quantity;
-  final String id;
+class CartItem {
+  final String? item;
+  final int? quantity;
+  final String? id;
 
-  OrderItem({
-    required this.itemId,
-    required this.quantity,
-    required this.id,
+  CartItem({
+    this.item,
+    this.quantity,
+    this.id,
   });
 
-  factory OrderItem.fromJson(Map<String, dynamic> json) {
-    return OrderItem(
-      itemId: json['item'],
+  factory CartItem.fromJson(Map<String, dynamic> json) {
+    return CartItem(
+      item: json['item'],
       quantity: json['quantity'],
       id: json['_id'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'item': item,
+      'quantity': quantity,
+      '_id': id,
+    };
   }
 }

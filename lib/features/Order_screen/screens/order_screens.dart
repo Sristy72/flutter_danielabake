@@ -5,6 +5,7 @@ import 'package:danielabake/features/Order_screen/widget/cart_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/order_controller.dart';
+import '../widget/simmer_card.dart';
 
 class OrderScreens extends StatefulWidget {
   const OrderScreens({super.key});
@@ -41,16 +42,40 @@ class _OrderScreensState extends State<OrderScreens> {
           // Cart Items Section
           Expanded(
             child: Obx(() {
+              // Loading state → Show 4-6 shimmering cards
               if (controller.cart.value == null) {
-                return const Center(child: CircularProgressIndicator());
+                return ListView.builder(
+                  physics: const NeverScrollableScrollPhysics(), // optional: feels more like skeleton
+                  itemCount: 5, // adjust as needed
+                  itemBuilder: (context, index) => const ShimmerCartItemCard(),
+                );
               }
 
               final cartItems = controller.cart.value!.items;
 
+              // Empty state
               if (cartItems.isEmpty) {
-                return const Center(child: Text('Your cart is empty'));
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.shopping_cart_outlined, size: 80, color: Colors.grey[400]),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Your cart is empty',
+                        style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Add delicious items to get started!',
+                        style: TextStyle(color: Colors.grey[500]),
+                      ),
+                    ],
+                  ),
+                );
               }
 
+              // Real data
               return ListView.builder(
                 itemCount: cartItems.length,
                 itemBuilder: (context, index) {

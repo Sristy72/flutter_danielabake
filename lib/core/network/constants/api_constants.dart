@@ -1,22 +1,23 @@
 class ApiConstants {
   /// [Base Configuration]
-  static const String baseDomain = 'http://10.10.5.33:5002'; // eshita
-  //static const String baseDomain = 'https://api.danielabakehousebakery.com'; // Publish
+ // static const String baseDomain = 'http://10.10.5.33:5002'; // eshita
+  // static const String baseDomain = 'https://daniela-bake-backend.onrender.com'; // Publish
   // static const String baseDomain = 'http://18.116.214.151'; /// [AWS]
   // static const String baseDomain = 'http://192.168.0.218:8000';
   //static const String baseDomain = 'http://192.168.0.106:5001';///eshitas laptop
+  static const String baseDomain = 'https://api.danielabakehousebakery.com'; // Live
   static const String baseUrl = '$baseDomain/api/v1';
 
   /// Dynamically generated WebSocket URL based on baseDomain
-  static String get webSocketUrl {
-    if (baseDomain.startsWith('https://')) {
-      return baseDomain.replaceFirst('https://', 'wss://');
-    } else if (baseDomain.startsWith('http://')) {
-      return baseDomain.replaceFirst('http://', 'ws://');
-    }
-    // Fallback for unexpected cases (e.g., no scheme)
-    return 'ws://$baseDomain';
-  }
+  // static String get webSocketUrl {
+  //   if (baseDomain.startsWith('https://')) {
+  //     return baseDomain.replaceFirst('https://', 'wss://');
+  //   } else if (baseDomain.startsWith('http://')) {
+  //     return baseDomain.replaceFirst('http://', 'ws://');
+  //   }
+  //   // Fallback for unexpected cases (e.g., no scheme)
+  //   return 'ws://$baseDomain';
+  // }
 
   /// [Headers]
   static Map<String, String> get defaultHeaders => {

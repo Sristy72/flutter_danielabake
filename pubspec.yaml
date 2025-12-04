@@ -22,7 +22,7 @@ dependencies:
   flutter_svg: ^2.2.3
 
   # State Managemet
-  get: ^4.7.2
+  get: ^4.7.3
 
   # Network 
   dio: ^5.9.0

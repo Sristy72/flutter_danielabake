@@ -63,12 +63,12 @@ class FoodCard extends StatelessWidget {
                     try {
                       if (!isFavorite.value) {
                         // Add favorite
-                        await favoriteController.favorite(itemId);
                         isFavorite.value = true; // update UI after success
+                        await favoriteController.favorite(itemId);
                       } else {
                         // Remove favorite
-                        await favoriteController.removeFavorite(itemId);
                         isFavorite.value = false; // update UI after success
+                        await favoriteController.removeFavorite(itemId);
                       }
                     } catch (e) {
                       DPrint.log("Favorite toggle error: $e");
