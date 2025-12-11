@@ -78,7 +78,7 @@ class _FoodListScreenState extends State<FoodListScreen> {
                       image: food.image,
                       ingredients: food.ingredients
                           .map((e) => e.name)
-                          .toList(), price: food.price.toString(), id: food.id,
+                          .toList(), price: food.price.toString(), id: food.id, rating: food.rating, reviewsCount: food.reviewsCount,
                     ),
                   ));
                 },
@@ -109,7 +109,7 @@ class _FoodListScreenState extends State<FoodListScreen> {
                     } catch (e) {
                       DPrint.log("Favorite toggle error: $e");
                     }
-                  },
+                  }, rating: food.rating, reviewCount: food.reviewsCount,
                 ),
               );
             },

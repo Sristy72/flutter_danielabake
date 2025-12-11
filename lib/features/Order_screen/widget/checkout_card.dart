@@ -18,11 +18,11 @@ class CheckoutCard extends StatelessWidget {
     // inside CheckoutCard widget
     final OrderController controller = Get.find<OrderController>();
 
-    quantity.value = cartItem.quantity;
+    quantity.value = cartItem.quantity!;
 
     final item = cartItem.item;
 
-    final price = item.price;
+    final price = item?.price;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -42,7 +42,7 @@ class CheckoutCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Image.network(
-                  item.image,
+                  item!.image,
                   width: 100,
                   height: 100,
                   fit: BoxFit.cover,
@@ -79,7 +79,7 @@ class CheckoutCard extends StatelessWidget {
                 children: [
                   Obx(
                         () => Text(
-                      '\$${(price * quantity.value).toStringAsFixed(2)}',
+                      '\$${(price! * quantity.value).toStringAsFixed(2)}',
                       style: const TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 16,
@@ -99,7 +99,7 @@ class CheckoutCard extends StatelessWidget {
                             quantity.value--;
                             cartItem.quantity = quantity.value;
 
-                            controller.removeOneItemFromCart(cartItem.item.id); // <-- API CALL
+                            controller.removeOneItemFromCart(cartItem.item!.id); // <-- API CALL
                           }
                         },
                       ),
@@ -125,7 +125,7 @@ class CheckoutCard extends StatelessWidget {
                           quantity.value++;
                           cartItem.quantity = quantity.value;
 
-                          controller.addCart(cartItem.item.id, quantity1.value); // <-- API CALL
+                          controller.addCart(cartItem.item!.id, quantity1.value); // <-- API CALL
                         },
                       ),
                     ],

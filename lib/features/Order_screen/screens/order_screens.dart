@@ -42,19 +42,17 @@ class _OrderScreensState extends State<OrderScreens> {
           // Cart Items Section
           Expanded(
             child: Obx(() {
-              // Loading state → Show 4-6 shimmering cards
-              if (controller.cart.value == null) {
+              // Show shimmer while explicitly loading
+              if (controller.isLoading.value) {
                 return ListView.builder(
-                  physics: const NeverScrollableScrollPhysics(), // optional: feels more like skeleton
-                  itemCount: 5, // adjust as needed
+                  padding: const EdgeInsets.symmetric(horizontal: 0),
+                  itemCount: 5,
                   itemBuilder: (context, index) => const ShimmerCartItemCard(),
                 );
               }
 
-              final cartItems = controller.cart.value!.items;
-
-              // Empty state
-              if (cartItems.isEmpty) {
+              // After loading, check if cart is empty
+              if (controller.cart.value == null || controller.cart.value!.items.isEmpty) {
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -75,11 +73,11 @@ class _OrderScreensState extends State<OrderScreens> {
                 );
               }
 
-              // Real data
+              // Show actual cart items
               return ListView.builder(
-                itemCount: cartItems.length,
+                itemCount: controller.cart.value!.items.length,
                 itemBuilder: (context, index) {
-                  final item = cartItems[index];
+                  final item = controller.cart.value!.items[index];
                   return CartItemCard(cartItem: item);
                 },
               );
@@ -88,18 +86,21 @@ class _OrderScreensState extends State<OrderScreens> {
 
           // Only show the button if there are items in the cart
           Obx(() {
-            if (controller.cart.value != null &&
-                controller.cart.value!.items.isNotEmpty) {
+            final hasItems = controller.cart.value != null &&
+                controller.cart.value!.items.isNotEmpty &&
+                !controller.isLoading.value;
+
+            if (hasItems) {
               return Padding(
-                padding: const EdgeInsets.only(top: 8.0),
+                padding: const EdgeInsets.all(16.0),
                 child: PrimaryButton(
                   text: 'Place Order',
-                  onSimplePressed: () async => Get.to(() => CheckoutScreen()),
+                  key: Key("order-screen"),
+                  onSimplePressed: () => Get.to(() => CheckoutScreen()),
                 ),
               );
-            } else {
-              return const SizedBox.shrink(); // empty space if no items
             }
+            return const SizedBox.shrink();
           }),
         ],
       ),

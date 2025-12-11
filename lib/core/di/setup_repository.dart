@@ -18,6 +18,8 @@ import 'package:danielabake/features/home/repositories/home_repository_impl.dart
 import 'package:danielabake/features/home/repositories/search_repository.dart';
 import 'package:danielabake/features/home/repositories/search_repository_impl.dart';
 import 'package:danielabake/features/profile_screens/repositories/profile_repository.dart';
+import 'package:danielabake/features/review_rating/repositories/rate_repo.dart';
+import 'package:danielabake/features/review_rating/repositories/rate_repo_impl.dart';
 import 'package:get/get.dart';
 
 import '../../features/profile_screens/repositories/profile_repository_impl.dart';
@@ -33,4 +35,5 @@ void setupRepository() {
   Get.getOrPut<PlaceOrderRepo>(() => PlaceOrderRepoImpl(apiClient: Get.find()));
   Get.getOrPut<SearchRepository>(() => SearchRepositoryImpl(apiClient: Get.find()));
   Get.getOrPut<MsgRepository>(() => MessageRepoImpl(apiClient: Get.find()));
+  Get.getOrPut<RateRepo>(() => RateRepoImpl(apiClient: Get.find()));
 }

@@ -16,10 +16,14 @@ class GetCartResponseModel {
   });
 
   factory GetCartResponseModel.fromJson(Map<String, dynamic> json) {
+    var itemsList = json['items'] as List<dynamic>? ?? [];
     return GetCartResponseModel(
       id: json['_id'],
       user: json['user'],
-      items: (json['items'] as List).map((e) => CartItem.fromJson(e)).toList(),
+      items: itemsList
+          .map((e) => CartItem.fromJson(e as Map<String, dynamic>))
+          .where((cartItem) => cartItem.item != null) // Optional: filter out deleted items
+          .toList(),
       total: (json['total'] as num).toDouble(),
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
@@ -29,19 +33,22 @@ class GetCartResponseModel {
 
 class CartItem {
   final String id;
-  final ItemDetails item;
+  final ItemDetails? item;
   int quantity;
 
   CartItem({
     required this.id,
-    required this.item,
+     this.item,
     required this.quantity,
   });
 
   factory CartItem.fromJson(Map<String, dynamic> json) {
+    final itemJson = json['item'];
     return CartItem(
       id: json['_id'] as String,
-      item: ItemDetails.fromJson(json['item'] as Map<String, dynamic>),
+      item: itemJson == null
+          ? null
+          : ItemDetails.fromJson(itemJson as Map<String, dynamic>),
       quantity: json['quantity'] as int,
     );
   }
@@ -72,5 +79,3 @@ class ItemDetails {
     );
   }
 }
-
-

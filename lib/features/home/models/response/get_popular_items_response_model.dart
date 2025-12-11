@@ -62,7 +62,11 @@ class PopularItem {
           .map((e) => ItemIngredient.fromJson(e))
           .toList(),
       rating: (json['rating'] as num).toDouble(),
-      reviewsCount: json['reviewsCount'],
+      reviewsCount: json['reviewsCount'] != null
+          ? (json['reviewsCount'] is num
+          ? json['reviewsCount'] as int
+          : int.parse(json['reviewsCount'].toString()))
+          : 0,
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
     );

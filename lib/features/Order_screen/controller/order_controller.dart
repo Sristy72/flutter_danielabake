@@ -1,7 +1,7 @@
 import 'dart:developer' as DPrint;
 import 'package:danielabake/features/Order_screen/models/request/place_order_request_model.dart';
 import 'package:danielabake/features/Order_screen/models/response/get_cart_response_model.dart';
-import 'package:danielabake/features/Order_screen/models/response/get_order_by_id_response%20model.dart';
+import 'package:danielabake/features/Order_screen/models/response/get_order_by_id_response_model.dart';
 import 'package:danielabake/features/Order_screen/repositories/cart_repository.dart';
 import 'package:danielabake/features/Order_screen/repositories/place_order_repo.dart';
 import 'package:danielabake/features/home/screens/home_screen.dart';
@@ -124,9 +124,9 @@ class OrderController extends BaseController {
     // 1. Optimistically remove from UI IMMEDIATELY
     final currentCart = cart.value;
     if (currentCart != null) {
-      final removedItem = currentCart.items.firstWhereOrNull((e) => e.item.id == itemId);
+      final removedItem = currentCart.items.firstWhereOrNull((e) => e.item?.id == itemId);
       if (removedItem != null) {
-        currentCart.items.removeWhere((e) => e.item.id == itemId);
+        currentCart.items.removeWhere((e) => e.item?.id == itemId);
         cart.refresh(); // This triggers instant rebuild in Obx(() => CartItemCard)
 
         Get.snackbar(

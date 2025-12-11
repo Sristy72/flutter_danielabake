@@ -5,6 +5,8 @@ class FoodModel {
   final String image; // network or asset
   final String price; // network or asset
   final List<String> ingredients;
+  final double rating;
+  final int reviewsCount;
 
   FoodModel({
     required this.id,
@@ -12,6 +14,7 @@ class FoodModel {
     required this.description,
     required this.image,
     required this.price,
-    required this.ingredients,
+    required this.ingredients, required this.rating, required this.reviewsCount,
   });
 }
+

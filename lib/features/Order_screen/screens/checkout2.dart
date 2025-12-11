@@ -26,11 +26,10 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
     orderController.fetchCart();
   }
 
-  _submit(){
+  Future<void> _submit() async {
     // if (!_formKey.currentState!.validate()) return;
     orderController.placeOrder(addressController.text, phoneController.text);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -51,24 +50,44 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
           color: Color(0x2EFFB972), // full width to bottom
         ),
         child: Padding(
-          padding: const EdgeInsets.only(top: 20.0, left: 15, right: 15, bottom: 20),
+          padding: const EdgeInsets.only(
+            top: 20.0,
+            left: 15,
+            right: 15,
+            bottom: 20,
+          ),
           child: Column(
-            mainAxisSize: MainAxisSize.min, // important to avoid full-screen height
+            mainAxisSize:
+                MainAxisSize.min, // important to avoid full-screen height
             children: [
               Obx(
-              ()=> Row(
+                () => Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Total", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),),
-                    Text("\$${orderController.cart.value!.total.toStringAsFixed(2)}", style: TextStyle(fontSize: 17, fontWeight: FontWeight.w500),),
+                    Text(
+                      "Total",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      "\$${orderController.cart.value!.total.toStringAsFixed(2)}",
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ],
                 ),
               ),
-              SizedBox(
-                height: 10,
-              ),
+              SizedBox(height: 10),
 
-              PrimaryButton(text: 'Place Order', onApiPressed: () => _submit()),
+              PrimaryButton(
+                text: 'Place Order',
+                key: Key("checkout"),
+                onApiPressed: () => _submit(),
+              ),
             ],
           ),
         ),
@@ -137,7 +156,6 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
     );
   }
 
-
   Widget _divider() {
     return const Padding(
       padding: EdgeInsets.symmetric(horizontal: 12),
@@ -155,22 +173,29 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: Row(
         children: [
-          Container(decoration: BoxDecoration(
-          color: Color(0xFFFFEFD5),
-            borderRadius: BorderRadius.circular(44)
-      ),child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: AppSvg(asset: imagePath, width: 22,height: 22,),
-      )),
+          Container(
+            decoration: BoxDecoration(
+              color: Color(0xFFFFEFD5),
+              borderRadius: BorderRadius.circular(44),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: AppSvg(asset: imagePath, width: 22, height: 22),
+            ),
+          ),
           const SizedBox(width: 10),
 
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: const TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.w600)),
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
                 child,
               ],
             ),

@@ -2,7 +2,6 @@ import 'dart:developer' as DPrint;
 import 'package:danielabake/core/common/widgets/appbar_text.dart';
 import 'package:danielabake/core/common/widgets/text_with_view_all_button.dart';
 import 'package:danielabake/core/constants/assets_const.dart';
-import 'package:danielabake/features/home/controller/cart_controller.dart';
 import 'package:danielabake/features/home/controller/favorite_food_controller.dart';
 import 'package:danielabake/features/home/controller/home_controller.dart';
 import 'package:danielabake/features/home/screens/all_category_screen.dart';
@@ -114,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 .map((e) => e.name)
                                 .toList(),
                             price: item.price.toString(),
-                            id: item.id,
+                            id: item.id, rating: item.rating, reviewsCount: item.reviewsCount,
                           ),
                         ));
                       },
@@ -147,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           } catch (e) {
                             DPrint.log("Favorite toggle error: $e");
                           }
-                        },
+                        }, rating: item.rating, reviewCount: item.reviewsCount,
                       ),
                     );
                   },

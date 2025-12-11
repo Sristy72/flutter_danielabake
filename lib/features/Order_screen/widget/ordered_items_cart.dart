@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/response/get_order_by_id_response model.dart';
+import '../models/response/get_order_by_id_response_model.dart';
 
 class OrderedItemCard extends StatelessWidget {
   final OrderItem orderItem;

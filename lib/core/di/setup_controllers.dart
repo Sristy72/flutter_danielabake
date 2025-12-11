@@ -6,6 +6,7 @@ import 'package:danielabake/features/home/controller/category_controller.dart';
 import 'package:danielabake/features/home/controller/favorite_food_controller.dart';
 import 'package:danielabake/features/home/controller/home_controller.dart';
 import 'package:danielabake/features/profile_screens/controller/profile_controller.dart';
+import 'package:danielabake/features/review_rating/controllers/rating_controller.dart';
 import 'package:get/get.dart';
 
 import '../../features/chat_screen/controller/message_controller.dart';
@@ -19,4 +20,5 @@ void setupControllers() {
   // Get.getOrPut(() => AddToCartController());
   Get.getOrPut(() => OrderController());
   Get.getOrPut(() => MessageController());
+  Get.getOrPut(() => RatingController());
 }

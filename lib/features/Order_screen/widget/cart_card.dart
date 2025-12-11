@@ -15,11 +15,39 @@ class CartItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (cartItem.item == null) {
+      return Container(
+        margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.info_outline, color: Colors.grey[600]),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                "This item is no longer available and has been removed.",
+                style: TextStyle(color: Colors.grey[700]),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                // Get.find<OrderController>().removeCartByCartItemId(cartItem.id);
+              },
+              child: const Text("Remove"),
+            ),
+          ],
+        ),
+      );
+    }
     quantity.value = cartItem.quantity;
     final OrderController controller = Get.find<OrderController>();
 
     final item = cartItem.item;
-    final price = item.price;
+    final price = item?.price ?? 0.0;
 
     return Stack(
       clipBehavior: Clip.none,
@@ -27,7 +55,7 @@ class CartItemCard extends StatelessWidget {
         // MAIN CARD
         Container(
           padding: const EdgeInsets.all(16),
-          margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+          margin: const EdgeInsets.symmetric(vertical: 12,),
           decoration: BoxDecoration(
             color: const Color(0x2EFFB972), // soft peach color
             borderRadius: BorderRadius.circular(18),
@@ -45,7 +73,7 @@ class CartItemCard extends StatelessWidget {
                     ClipRRect(
                       borderRadius: BorderRadius.circular(12),
                       child: Image.network(
-                        item.image,
+                        item!.image,
                         width: 100,
                         height: 100,
                         fit: BoxFit.cover,
@@ -81,7 +109,7 @@ class CartItemCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          '\$${price.toStringAsFixed(2)}',
+                          '\$${price?.toStringAsFixed(2)}',
                           style: const TextStyle(
                             fontWeight: FontWeight.w500,
                             fontSize: 16,
@@ -104,7 +132,7 @@ class CartItemCard extends StatelessWidget {
                                     if (quantity.value > 1) {
                                       quantity.value--;
                                       cartItem.quantity = quantity.value;
-                                      controller.removeOneItemFromCart(cartItem.item.id);
+                                      controller.removeOneItemFromCart(cartItem.item!.id);
                                     }
                                   },
                                 ),
@@ -127,7 +155,7 @@ class CartItemCard extends StatelessWidget {
                                     quantity.value++;
                                     cartItem.quantity = quantity.value;
                                     controller.addCart(
-                                        cartItem.item.id, quantity1.value);
+                                        cartItem.item!.id, quantity1.value);
                                   },
                                 ),
                               ],
@@ -160,7 +188,7 @@ class CartItemCard extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '\$${(price * quantity.value).toStringAsFixed(2)}',
+                        '\$${(price! * quantity.value).toStringAsFixed(2)}',
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -177,12 +205,12 @@ class CartItemCard extends StatelessWidget {
         // CROSS BUTTON (TOP RIGHT)
         Positioned(
           top: 12,
-          right: 10,
+          right: 8,
           child: Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
             child: GestureDetector(
               onTap: () {
-                controller.removeCart(cartItem.item.id); // This now removes instantly!
+                controller.removeCart(cartItem.item!.id); // This now removes instantly!
               },
               child: Container(
                 padding: const EdgeInsets.all(4),

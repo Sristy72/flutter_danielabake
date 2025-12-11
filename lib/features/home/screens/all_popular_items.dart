@@ -23,9 +23,17 @@ class _AllPopularItemsState extends State<AllPopularItems> {
   final _favoriteFoodController = Get.find<FavoriteFoodController>();
   final _cartController = Get.find<OrderController>();
 
+
+
   final TextEditingController _searchController = TextEditingController();
   final RxBool _isSearching = false.obs;
   final RxBool _isSearchExpanded = false.obs;
+
+  @override
+  void initState() {
+    _homeController.popularItem();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,10 +126,11 @@ class _AllPopularItemsState extends State<AllPopularItems> {
                       image: item.image,
                       ingredients: item.ingredients.map((e) => e.name).toList(),
                       price: item.price.toString(),
-                      id: item.id,
+                      id: item.id, rating: item.rating, reviewsCount: item.reviewsCount,
                     ),
                   ));
                 },
+
                 child: FoodCard(
                   imagePath: item.image,
                   title: item.name,
@@ -149,7 +158,7 @@ class _AllPopularItemsState extends State<AllPopularItems> {
                     } catch (e) {
                       DPrint.log("Favorite Error: $e");
                     }
-                  },
+                  }, rating: item.rating, reviewCount: item.reviewsCount,
                 ),
               );
             },

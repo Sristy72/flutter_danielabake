@@ -6,13 +6,16 @@ import '../controller/favorite_food_controller.dart';
 
 class FoodCard extends StatelessWidget {
   final String imagePath;
+  final double? rating;
+  final int? reviewCount;
   final String title;
   final String description;
   final String price;
   final String itemId;
   final RxBool isFavorite; // Observable
   final VoidCallback onAdd;
-  final Future<void> Function(bool newValue)? onFavoriteToggle; // optional callback
+  final Future<void> Function(bool newValue)?
+  onFavoriteToggle; // optional callback
 
   const FoodCard({
     super.key,
@@ -24,21 +27,24 @@ class FoodCard extends StatelessWidget {
     required this.isFavorite,
     required this.onAdd,
     this.onFavoriteToggle,
+    this.rating,
+    this.reviewCount,
   });
 
   @override
   Widget build(BuildContext context) {
-    final FavoriteFoodController favoriteController = Get.find<FavoriteFoodController>();
+    final FavoriteFoodController favoriteController =
+        Get.find<FavoriteFoodController>();
 
     return Container(
-      width: 158,
-      height: 262,
+      // Remove width and height here — let GridView control it
       decoration: BoxDecoration(
         color: const Color(0xFFFFE0B2),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min, // Important: don't force max height
         children: [
           // Image with favorite icon
           Stack(
@@ -58,40 +64,47 @@ class FoodCard extends StatelessWidget {
               Positioned(
                 top: 8,
                 right: 8,
-                child: Obx(() => InkWell(
-                  onTap: () async {
-                    try {
-                      if (!isFavorite.value) {
-                        // Add favorite
-                        isFavorite.value = true; // update UI after success
-                        await favoriteController.favorite(itemId);
-                      } else {
-                        // Remove favorite
-                        isFavorite.value = false; // update UI after success
-                        await favoriteController.removeFavorite(itemId);
+                child: Obx(
+                  () => InkWell(
+                    onTap: () async {
+                      try {
+                        final newValue = !isFavorite.value;
+                        isFavorite.value = newValue; // Optimistic update
+
+                        if (newValue) {
+                          await favoriteController.favorite(itemId);
+                          onFavoriteToggle?.call(true);
+                        } else {
+                          await favoriteController.removeFavorite(itemId);
+                          onFavoriteToggle?.call(false);
+                        }
+                      } catch (e) {
+                        isFavorite.value = !isFavorite.value; // Revert on error
+                        DPrint.log("Favorite toggle error: $e");
                       }
-                    } catch (e) {
-                      DPrint.log("Favorite toggle error: $e");
-                    }
-                  },
-                  child: CircleAvatar(
-                    radius: 12,
-                    backgroundColor: const Color(0xBD3C84F0),
-                    child: Icon(
-                      isFavorite.value ? Icons.favorite : Icons.favorite_border,
-                      color: isFavorite.value ? Colors.white : Colors.grey,
-                      size: 16,
+                    },
+                    child: CircleAvatar(
+                      radius: 12,
+                      backgroundColor: const Color(0xBD3C84F0),
+                      child: Icon(
+                        isFavorite.value
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        color: isFavorite.value ? Colors.white : Colors.grey,
+                        size: 16,
+                      ),
                     ),
                   ),
-                ))
-
+                ),
               ),
             ],
           ),
 
-          // Title
+          const SizedBox(height: 8),
+
+          // Title, Description, Rating
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -101,24 +114,72 @@ class FoodCard extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                     fontSize: 14,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-
+                const SizedBox(height: 4),
                 Text(
                   description,
                   style: const TextStyle(
                     fontWeight: FontWeight.w400,
-                    fontSize: 14,
+                    fontSize: 12,
+                    color: Colors.black87,
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
+                const SizedBox(height: 6),
+
+                // Stars + Review Count in ONE Row
+                if (rating != null && rating! > 0)
+                  Row(
+                    children: [
+                      // 5 Stars
+                      ...List.generate(5, (index) {
+                        double starValue = index + 1.0;
+                        if (rating! >= starValue) {
+                          return const Icon(
+                            Icons.star,
+                            color: Color(0xFF7F3615),
+                            size: 14,
+                          );
+                        } else if (rating! >= starValue - 0.5) {
+                          return const Icon(
+                            Icons.star_half,
+                            color: Color(0xFF7F3615),
+                            size: 14,
+                          );
+                        } else {
+                          return const Icon(
+                            Icons.star_border,
+                            color: Color(0xFF7F3615),
+                            size: 14,
+                          );
+                        }
+                      }),
+
+
+                      const SizedBox(width: 8),
+                      // Inside the Row, replace the current Text widget with this:
+
+                        Text(
+                          '(${reviewCount ?? 0})',  // Explicitly convert int to String
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                    ],
+                  ),
               ],
             ),
           ),
 
-          const SizedBox(height: 25),
-
+          const Spacer(), // Pushes price + button to bottom
           // Price + add button
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -140,7 +201,6 @@ class FoodCard extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 8),
         ],
       ),
     );

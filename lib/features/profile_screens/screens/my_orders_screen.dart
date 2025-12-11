@@ -1,9 +1,11 @@
 import 'package:danielabake/core/common/widgets/app_scaffold.dart';
 import 'package:danielabake/features/Order_screen/controller/order_controller.dart';
+import 'package:danielabake/features/profile_screens/controller/review_controller.dart';
+import 'package:danielabake/features/review_rating/controllers/rating_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../controller/profile_controller.dart';
+import '../../../core/common/widgets/button_widgets.dart';
 
 class MyOrdersScreen extends StatefulWidget {
   const MyOrdersScreen({super.key});
@@ -15,21 +17,31 @@ class MyOrdersScreen extends StatefulWidget {
 class _MyOrdersScreenState extends State<MyOrdersScreen>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
-  final controller = Get.find<OrderController>();
+  final orderController = Get.find<OrderController>();
+  final ratingController = Get.find<RatingController>();
+
+  // Review UI Controller (for stars & text field)
+  final reviewController = Get.put(ReviewController());
 
   @override
   void initState() {
     super.initState();
     tabController = TabController(length: 2, vsync: this);
-    controller.fetchOngoingOrders(); // fetch when screen opens
+    orderController.fetchOngoingOrders();
+    orderController.fetchCompletedOrders();
+  }
+
+  @override
+  void dispose() {
+    tabController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
       removePadding: true,
-      backgroundColor: const Color(0xffFFF8E8), // same soft background
-
+      backgroundColor: const Color(0xffFFF8E8),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: const Color(0xffFFF8E8),
@@ -37,273 +49,407 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
         title: const Text(
           "My Orders",
           style: TextStyle(
-              fontWeight: FontWeight.w500,
-              color: Colors.black,
-              fontSize: 20
+            fontWeight: FontWeight.w500,
+            color: Colors.black,
+            fontSize: 20,
           ),
         ),
         bottom: TabBar(
           controller: tabController,
-          // Custom indicator with color and size
-          indicator: UnderlineTabIndicator(
-            borderSide: BorderSide(width: 3.0, color: Color(0xFF7F3615)), // thickness & color
-            insets: EdgeInsets.symmetric(horizontal: -35), // smaller horizontal inset = longer line
+          indicator: const UnderlineTabIndicator(
+            borderSide: BorderSide(width: 3.0, color: Color(0xFF7F3615)),
+            insets: EdgeInsets.symmetric(horizontal: 40),
           ),
-          labelColor: Color(0xFF7F3615),
-          labelStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),// selected tab text color
-          unselectedLabelColor: Colors.grey, // unselected tab text color
+          labelColor: const Color(0xFF7F3615),
+          unselectedLabelColor: Colors.grey,
+          labelStyle: const TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 16,
+          ),
           tabs: const [
             Tab(text: "Ongoing"),
             Tab(text: "Completed"),
           ],
         ),
       ),
-
-
       body: TabBarView(
         controller: tabController,
-        children: [
-          /// First Tab - ONGOING
-          _ongoingList(),
+        children: [_ongoingList(), _completedList()],
+      ),
+    );
+  }
 
-          /// Second Tab - COMPLETED (empty for now)
-          _completList()
+  Widget _ongoingList() {
+    return Obx(() {
+      if (orderController.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      final data = orderController.ongoingOrder.value;
+      if (data == null || data.orders.isEmpty) {
+        return const Center(child: Text("No ongoing orders"));
+      }
+
+      return ListView.builder(
+        padding: const EdgeInsets.all(12),
+        itemCount: data.orders.length,
+        itemBuilder: (context, index) {
+          final order = data.orders[index];
+          return _buildOrderCard(order);
+        },
+      );
+    });
+  }
+
+  Widget _completedList() {
+    return Obx(() {
+      if (orderController.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      final data = orderController.completedOrder.value;
+      if (data == null || data.orders.isEmpty) {
+        return const Center(child: Text("No completed orders yet"));
+      }
+
+      return ListView.builder(
+        padding: const EdgeInsets.all(12),
+        itemCount: data.orders.length,
+        itemBuilder: (context, index) {
+          final order = data.orders[index];
+          return _buildOrderCard(order, isCompleted: true);
+        },
+      );
+    });
+  }
+
+  Widget _buildOrderCard(dynamic order, {bool isCompleted = false}) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.orange.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Order Id: #${order.id.substring(order.id.length - 6)}",
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                ),
+              ),
+              Text(
+                order.status ?? "Delivered",
+                style: TextStyle(
+                  color: order.status == "Delivered"
+                      ? Colors.green.shade700
+                      : Colors.green,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Items List
+          ...order.items.map<Widget>((orderItem) {
+            final item = orderItem.item;
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.03),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Image.network(
+                        item.image,
+                        height: 70,
+                        width: 70,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.fastfood, size: 32),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.name,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Qty: ${orderItem.quantity}",
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                          if (isCompleted) ...[
+                            const SizedBox(height: 6),
+                            TextButton(
+                              onPressed: () => _showRatingDialog(order, orderItem), // Pass order + orderItem
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                minimumSize: const Size(0, 0),
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              ),
+                              child: const Text(
+                                "Rate & Review",
+                                style: TextStyle(
+                                  color: Color(0xFF7F3615),
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    Text(
+                      "\$${item.price.toStringAsFixed(2)}",
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+
+          const Divider(color: Color(0xFFAD653F), thickness: 1, height: 30),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "(${order.items.length} items)",
+                style: const TextStyle(color: Colors.grey),
+              ),
+              Text(
+                "Total: \$${order.totalAmount.toStringAsFixed(2)}",
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 17,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  ///ONGOING LIST (FROM API)
-  Widget _ongoingList() {
-    return Obx(() {
-      if (controller.isLoading.value) {
-        return const Center(child: CircularProgressIndicator());
-      }
+  // Rating Dialog
+  void _showRatingDialog(dynamic order, dynamic orderItem) {
+    final item = orderItem.item;
+    final int quantity = orderItem.quantity;
+    final double itemTotal = item.price * quantity;
 
-      final data = controller.ongoingOrder.value;
+    // Reset every time dialog opens
+    reviewController.selectedRating.value = 0;
+    reviewController.feedbackController.clear();
 
-      if (data == null || data.orders.isEmpty) {
-        return const Center(child: Text("No Orders Found"));
-      }
+    Get.dialog(
+      barrierDismissible: true,
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: const Color(0xffFFF3E0),
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.15),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Close Button
+              Align(
+                alignment: Alignment.topRight,
+                child: GestureDetector(
+                  onTap: () => Get.back(),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xffFFE0B2),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: const Color(0xFFAD653F)),
+                    ),
+                    child: const Icon(Icons.close, size: 20, color: Color(0xFF7F3615)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
 
-      final orders = data.orders;
+              const Text("Rate this item", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 20),
 
-      return ListView.builder(
-        padding: const EdgeInsets.all(12),
-        itemCount: orders.length,
-        itemBuilder: (context, index) {
-          final order = orders[index];
-
-          return Container(
-            padding: const EdgeInsets.all(12),
-            margin: const EdgeInsets.only(bottom: 12),
-            decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// Order ID & Payment Status
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // Item Preview Card
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFE8CC),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
                   children: [
-                    Text("Order Id: #${order.id.substring(order.id.length - 6)}",
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
-                    Text(
-                      order.status,
-                      style: TextStyle(
-                        color: order.status == "Paid"
-                            ? Colors.green
-                            : order.status == "Pending"
-                            ? Colors.grey
-                            : Colors.red,
-                        fontWeight: FontWeight.bold,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.network(
+                        item.image,
+                        height: 80,
+                        width: 80,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.fastfood),
+                        ),
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-
-                /// Items list
-                Column(
-                  children: order.items.map((orderItem) {
-                    final item = orderItem.item;
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Row(
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.network(
-                              item.image,
-                              height: 70,
-                              width: 70,
-                              fit: BoxFit.cover,
-                            ),
+                          Text(
+                            item.name,
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  item.name,
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                                Text(orderItem.quantity.toString())
-                              ],
-                            ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "\$${itemTotal.toStringAsFixed(2)}  •  $quantity item${quantity > 1 ? 's' : ''}",
+                            style: TextStyle(color: Colors.grey[700]),
                           ),
-                          Text("\$${item.price.toStringAsFixed(2)}"),
+                          const SizedBox(height: 8),
+                          const Text("Order delivered", style: TextStyle(fontWeight: FontWeight.w600)),
                         ],
                       ),
-                    );
-                  }).toList(),
-                ),
-
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0, right: 8),
-                  child: const Divider(height: 20, thickness: 1, color: Color(0xFFAD653F),),
-                ),
-
-                /// Total amount & items count
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Total:  \$${order.totalAmount.toStringAsFixed(2)}",
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w500, fontSize: 16),
                     ),
-                    const SizedBox(width: 10),
-                    Text("(${order.items.length} items)"),
                   ],
                 ),
-              ],
-            ),
-          );
-        },
-      );
-    });
-  }
+              ),
 
+              const SizedBox(height: 30),
 
-  Widget _completList() {
-    return Obx(() {
-      if (controller.isLoading.value) {
-        return const Center(child: CircularProgressIndicator());
-      }
-
-      final data = controller.completedOrder.value;
-
-      if (data == null || data.orders.isEmpty) {
-        return const Center(child: Text("No Orders Found"));
-      }
-
-      final orders = data.orders;
-
-      return ListView.builder(
-        padding: const EdgeInsets.all(12),
-        itemCount: orders.length,
-        itemBuilder: (context, index) {
-          final order = orders[index];
-
-          return Container(
-            padding: const EdgeInsets.all(12),
-            margin: const EdgeInsets.only(bottom: 12),
-            decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                /// Order ID & Payment Status
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              // Rating Stars + Feedback
+              Obx(() => Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFE8CC),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
                   children: [
-                    Text("Order Id: #${order.id.substring(order.id.length - 6)}",
-                        style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
-                    Text(
-                      order.status,
-                      style: TextStyle(
-                        color: order.status == "Paid"
-                            ? Colors.green
-                            : order.status == "Pending"
-                            ? Colors.grey
-                            : Colors.red,
-                        fontWeight: FontWeight.bold,
+                    const Text("How was your experience?", style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: List.generate(5, (i) => GestureDetector(
+                        onTap: () => reviewController.setRating(i + 1),
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Icon(
+                            i < reviewController.selectedRating.value ? Icons.star : Icons.star_border,
+                            color: const Color(0xFF7F3615),
+                            size: 40,
+                          ),
+                        ),
+                      )),
+                    ),
+                    const SizedBox(height: 24),
+                    TextField(
+                      controller: reviewController.feedbackController,
+                      maxLines: 4,
+                      decoration: InputDecoration(
+                        hintText: "Share your thoughts (optional)...",
+                        hintStyle: const TextStyle(color: Colors.grey),
+                        filled: true,
+                        fillColor: const Color(0xFFFFEFD5),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Color(0xFF7F3615)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Color(0xFF7F3615)),
+                        ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+              )),
 
-                /// Items list
-                Column(
-                  children: order.items.map((orderItem) {
-                    final item = orderItem.item;
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Row(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.network(
-                              item.image,
-                              height: 70,
-                              width: 70,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  item.name,
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                                Text(orderItem.quantity.toString())
-                              ],
-                            ),
-                          ),
-                          Text("\$${item.price.toStringAsFixed(2)}"),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-                ),
+              const SizedBox(height: 30),
 
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0, right: 8),
-                  child: const Divider(height: 20, thickness: 1, color: Color(0xFFAD653F),),
+              // Submit Button
+              SizedBox(
+                width: double.infinity,
+                child: PrimaryButton(
+                  onApiPressed: () async => _submitRating(order, orderItem),
+                  text: "Submit",
                 ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
-                /// Total amount & items count
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Total:  \$${order.totalAmount.toStringAsFixed(2)}",
-                      style: const TextStyle(
-                          fontWeight: FontWeight.w500, fontSize: 16),
-                    ),
-                    const SizedBox(width: 10),
-                    Text("(${order.items.length} items)"),
-                  ],
-                ),
-              ],
-            ),
-          );
-        },
+  // Submit Review
+  Future<void> _submitRating(dynamic order, dynamic orderItem) async {
+    if (reviewController.selectedRating.value == 0) {
+      Get.snackbar(
+        "Missing Rating",
+        "Please select at least 1 star",
+        backgroundColor: Colors.red.withOpacity(0.2),
+        colorText: Colors.white,
       );
-    });
+      return;
+    }
+
+    final int rating = reviewController.selectedRating.value;
+    final String comment = reviewController.feedbackController.text.trim();
+    final String orderId = order.id;                    // Correct: from parent order
+    final String itemId = orderItem.item.id;            // Correct: from item
+
+    // Call API
+    await ratingController.addReview(orderId, itemId, comment, rating);
+
+    // Note: Success snackbar + Get.back() is already handled inside RatingController
+    // So we don't need to do it again here unless you want extra control
   }
-  }
-
-
-
-
+}

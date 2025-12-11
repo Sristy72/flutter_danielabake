@@ -1,7 +1,7 @@
 class GetFavoriteItemsResponseModel {
   final String id;
   final String user;
-  final FavoriteItem item;
+  final FavoriteItem? item;
   final String createdAt;
   final String updatedAt;
   final int v;
@@ -16,10 +16,14 @@ class GetFavoriteItemsResponseModel {
   });
 
   factory GetFavoriteItemsResponseModel.fromJson(Map<String, dynamic> json) {
+    final itemJson = json['item'];
     return GetFavoriteItemsResponseModel(
       id: json['_id'],
       user: json['user'],
-      item: FavoriteItem.fromJson(json['item']),
+      item: itemJson == null
+          ? null
+          : FavoriteItem.fromJson(itemJson as Map<String, dynamic>),
+      // item: FavoriteItem.fromJson(json['item']),
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
       v: json['__v'],

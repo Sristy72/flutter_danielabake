@@ -3,7 +3,7 @@ import '../../../../core/network/api_client.dart';
 import '../../../../core/network/constants/api_constants.dart';
 import '../../../../core/network/network_result.dart';
 import '../models/response/get_cart_response_model.dart';
-import '../models/response/get_order_by_id_response model.dart';
+import '../models/response/get_order_by_id_response_model.dart';
 
 
 

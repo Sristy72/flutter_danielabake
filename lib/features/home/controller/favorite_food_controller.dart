@@ -68,7 +68,6 @@ class FavoriteFoodController extends BaseController {
     result.fold(
           (fail) => setError(fail.message),
           (success) {
-        // ← THIS IS THE MAGIC LINE
         favoriteItems.assignAll(success.data);
         // No need for .refresh() — assignAll() does it automatically
       },
@@ -87,7 +86,7 @@ class FavoriteFoodController extends BaseController {
           (fail) => Get.snackbar('Error', fail.message),
           (success) {
         // INSTANT UI UPDATE — Remove from observable list
-        favoriteItems.removeWhere((entry) => entry.item.id == itemId);
+        favoriteItems.removeWhere((entry) => entry.item?.id == itemId);
         favoriteItems.refresh();
 
         Get.snackbar(

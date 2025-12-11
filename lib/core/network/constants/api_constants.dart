@@ -1,6 +1,6 @@
 class ApiConstants {
   /// [Base Configuration]
- // static const String baseDomain = 'http://10.10.5.33:5002'; // eshita
+  //static const String baseDomain = 'http://10.10.5.33:5002'; // eshita
   // static const String baseDomain = 'https://daniela-bake-backend.onrender.com'; // Publish
   // static const String baseDomain = 'http://18.116.214.151'; /// [AWS]
   // static const String baseDomain = 'http://192.168.0.218:8000';
@@ -41,6 +41,7 @@ class ApiConstants {
   static HomeEndpoints get home => HomeEndpoints();
   static OrderEndpoints get order => OrderEndpoints();
   static ChatEndpoints get chat => ChatEndpoints();
+  static RatingEndpoints get rating => RatingEndpoints();
 
 }
 
@@ -93,4 +94,10 @@ class ChatEndpoints {
   String createConversation = '${ApiConstants.baseUrl}/chat/conversations';
   String getAllMsg(String conversationId) => '${ApiConstants.baseUrl}/chat/messages/$conversationId';
   // String fetchCategory(String userId) =>;
+}
+
+class RatingEndpoints {
+  final String addReview = '${ApiConstants.baseUrl}/reviews';
+  String getReview(String itemId) => '${ApiConstants.baseUrl}/reviews/item/$itemId';
+  String deleteReview(String id) => '${ApiConstants.baseUrl}/reviews/$id';
 }

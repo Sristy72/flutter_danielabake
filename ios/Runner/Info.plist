@@ -45,5 +45,17 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+
+	<!-- Additional -->
+	
+	<!-- Photo Library Access (for selecting profile picture) -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Danielabake needs access to your photo library to let you select a profile picture.</string>
+
+	<!-- Required if your app saves the profile image back to library (rare for profile pics) -->
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Danielabake would like to save your profile picture.</string>
+
+
 </dict>
 </plist>
