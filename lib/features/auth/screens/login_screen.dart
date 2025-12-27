@@ -34,7 +34,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
   final ValueNotifier<bool> _obscurePassword = ValueNotifier<bool>(true);
   final rememberMeController = Get.put(RememberMeController());
 

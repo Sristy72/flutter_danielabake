@@ -1,7 +1,6 @@
 import 'dart:developer' as DPrint;
 import 'package:danielabake/core/common/widgets/appbar_text.dart';
 import 'package:danielabake/core/common/widgets/text_with_view_all_button.dart';
-import 'package:danielabake/core/constants/assets_const.dart';
 import 'package:danielabake/features/home/controller/favorite_food_controller.dart';
 import 'package:danielabake/features/home/controller/home_controller.dart';
 import 'package:danielabake/features/home/screens/all_category_screen.dart';
@@ -16,6 +15,7 @@ import '../widgets/grid_layout.dart';
 import '../widgets/models/detail_food_model.dart';
 import '../widgets/popular_items.dart';
 import '../widgets/responsive.dart';
+import '../widgets/weekly_menu_slider.dart';
 import 'food_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -55,20 +55,26 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: rw(context, 0.03)),
+              //SizedBox(height: rw(context, 0.03)),
 
-              /// Responsive Banner
-              GestureDetector(
-                onTap: () {},
-                child: SizedBox(
-                  height: rw(context, 0.50), // FIXED for all screens
-                  width: double.infinity,
-                  child: Image.asset(
-                    Images.discount,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
+              Text('Weekly Menu', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+              //Add slider here
+              SizedBox(height: rw(context, 0.02)),
+
+              const WeeklyMenuSlider(),
+
+              // /// Responsive Banner
+              // GestureDetector(
+              //   onTap: () {},
+              //   child: SizedBox(
+              //     height: rw(context, 0.50), // FIXED for all screens
+              //     width: double.infinity,
+              //     child: Image.asset(
+              //       Images.discount,
+              //       fit: BoxFit.cover,
+              //     ),
+              //   ),
+              // ),
 
               SizedBox(height: rw(context, 0.03)),
 
@@ -81,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
               SizedBox(height: rw(context, 0.05)),
 
               TextWithViewAllButton(
-                text: 'Popular Item',
+                text: 'Today\'s Items',
                 onTap: () => Get.to(() => AllPopularItems()),
               ),
 
@@ -127,7 +133,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         onAdd: () async {
                           try {
                             await _cartController.addCart(item.id, 1);
-                            Get.snackbar('Success', '${item.name} added to cart');
+                            Get.snackbar('Success', '${item.name} added to cart', backgroundColor: Colors.green,
+                                  colorText: Colors.white,
+                                  margin: const EdgeInsets.all(12),
+                                  duration: const Duration(seconds: 2),);
                           } catch (e) {
                             Get.snackbar(
                                 'Error', 'Failed to add ${item.name} to cart');
@@ -153,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               }),
 
-              SizedBox(height: rw(context, 0.05)),
+              //SizedBox(height: rw(context, 0.05)),
             ],
           ),
         ),

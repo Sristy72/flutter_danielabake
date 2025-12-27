@@ -141,7 +141,16 @@ class _AllPopularItemsState extends State<AllPopularItems> {
                   onAdd: () async {
                     try {
                       await _cartController.addCart(item.id, 1);
-                      Get.snackbar('Success', '${item.name} added to cart');
+                      //Get.snackbar('Success', '${item.name} added to cart');
+                      Get.snackbar(
+                        "Success",
+                        '${item.name} added to cart',
+                        backgroundColor: Colors.green,
+                        colorText: Colors.white,
+                        snackPosition: SnackPosition.BOTTOM,
+                        margin: const EdgeInsets.all(12),
+                        duration: const Duration(seconds: 2),
+                      );
                     } catch (e) {
                       Get.snackbar('Error', 'Failed to add ${item.name}');
                     }

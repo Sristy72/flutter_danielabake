@@ -96,21 +96,4 @@ class FirstScreen extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildDiamondImage(String imagePath, double size) {
-    return Transform.rotate(
-      angle: pi / 4,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: SizedBox(
-          width: size,
-          height: size,
-          child: Image.asset(
-            imagePath,
-            fit: BoxFit.cover,
-          ),
-        ),
-      ),
-    );
-  }
 }

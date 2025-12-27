@@ -65,7 +65,7 @@ class OrderController extends BaseController {
     final userId = await _authStorageService.getUserId();
     if (userId == null || userId.isEmpty) {
       setError('User ID not found. Please log in again.');
-      Get.snackbar('Error', 'User ID not found. Please log in again.');
+      // Get.snackbar('Error', 'User ID not found. Please log in again.');
       setLoading(false);
       return;
     }
@@ -84,15 +84,15 @@ class OrderController extends BaseController {
       },
           (success) async {
         // SUCCESS: Now refresh the cart locally
-        Get.snackbar(
-          "Success",
-          "Item added to cart",
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-          margin: const EdgeInsets.all(12),
-          duration: const Duration(seconds: 2),
-        );
+        // Get.snackbar(
+        //   "Success",
+        //   "Item added to cart",
+        //   backgroundColor: Colors.green,
+        //   colorText: Colors.white,
+        //   snackPosition: SnackPosition.BOTTOM,
+        //   margin: const EdgeInsets.all(12),
+        //   duration: const Duration(seconds: 2),
+        // );
 
         // Option 1: Best - Re-fetch the entire cart (most reliable)
         await fetchCart(); // This will update cart.value → triggers Obx → badge appears

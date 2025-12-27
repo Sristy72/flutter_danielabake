@@ -42,7 +42,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
   // No setState needed anymore
   void _loadCurrentUserId() async {
     final userId = await _authStorageService.getUserId();
-    currentUserId?.value = userId!; // This automatically triggers rebuild in Obx
+    currentUserId.value = userId!; // This automatically triggers rebuild in Obx
   }
 
   void _initializeQuantity() async {

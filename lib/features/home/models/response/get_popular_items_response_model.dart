@@ -33,6 +33,7 @@ class PopularItem {
   final List<ItemIngredient> ingredients;
   final double rating;
   final int reviewsCount;
+  final List<String> availableDays;
   final String createdAt;
   final String updatedAt;
 
@@ -46,6 +47,7 @@ class PopularItem {
     required this.ingredients,
     required this.rating,
     required this.reviewsCount,
+    required this.availableDays,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -67,6 +69,7 @@ class PopularItem {
           ? json['reviewsCount'] as int
           : int.parse(json['reviewsCount'].toString()))
           : 0,
+      availableDays: List<String>.from(json['availableDays']),
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
     );

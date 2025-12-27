@@ -2,10 +2,12 @@ import 'package:danielabake/core/common/widgets/app_scaffold.dart';
 import 'package:danielabake/features/Order_screen/controller/order_controller.dart';
 import 'package:danielabake/features/profile_screens/controller/review_controller.dart';
 import 'package:danielabake/features/review_rating/controllers/rating_controller.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../core/common/widgets/button_widgets.dart';
+import '../widgets/text_formatter.dart';
 
 class MyOrdersScreen extends StatefulWidget {
   const MyOrdersScreen({super.key});
@@ -390,23 +392,59 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
                       )),
                     ),
                     const SizedBox(height: 24),
-                    TextField(
-                      controller: reviewController.feedbackController,
-                      maxLines: 4,
-                      decoration: InputDecoration(
-                        hintText: "Share your thoughts (optional)...",
-                        hintStyle: const TextStyle(color: Colors.grey),
-                        filled: true,
-                        fillColor: const Color(0xFFFFEFD5),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFF7F3615)),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end, // Align word count to the right
+                      children: [
+                        TextField(
+                          controller: reviewController.feedbackController,
+                          maxLines: 4,
+                          inputFormatters: [
+                            MaxWordsInputFormatter(), // The formatter from previous response
+                          ],
+                          decoration: InputDecoration(
+                            hintText: "Share your thoughts (optional)...",
+                            hintStyle: const TextStyle(color: Colors.grey),
+                            filled: true,
+                            fillColor: const Color(0xFFFFEFD5),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Color(0xFF7F3615)),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Color(0xFF7F3615)),
+                            ),
+                            // Optional: Show word limit in the counter area inside the field
+                            counterText: "",
+                          ),
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: Color(0xFF7F3615)),
+                        const SizedBox(height: 8), // Space between TextField and counter
+                        ValueListenableBuilder<TextEditingValue>(
+                          valueListenable: reviewController.feedbackController,
+                          builder: (context, value, child) {
+                            // Calculate word count
+                            final text = value.text;
+                            final words = text.trim().split(RegExp(r'\s+'));
+                            final wordCount = text.isEmpty ? 0 : words.where((w) => w.isNotEmpty).length;
+
+                            // Optional: Change color when approaching or hitting the limit
+                            final color = wordCount > 80
+                                ? Colors.red
+                                : wordCount > 70
+                                ? Colors.orange
+                                : Colors.grey;
+
+                            return Text(
+                              "$wordCount/30 words",
+                              style: TextStyle(
+                                color: color,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            );
+                          },
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),

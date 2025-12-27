@@ -75,7 +75,7 @@ class HomeEndpoints {
    String searchItem(String text) => '${ApiConstants.baseUrl}/items?search=$text';
   final String favorite = '${ApiConstants.baseUrl}/favorites';
   final String removeFavorite = '${ApiConstants.baseUrl}/favorites';
-  final String popular = '${ApiConstants.baseUrl}/items';
+  final String popular = '${ApiConstants.baseUrl}/items?day=today';
   final String addCart = '${ApiConstants.baseUrl}/cart/add';
   final String removeCart = '${ApiConstants.baseUrl}/cart/remove';
   final String removeOneCart = '${ApiConstants.baseUrl}/cart/reduce';

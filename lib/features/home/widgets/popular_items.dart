@@ -61,42 +61,42 @@ class FoodCard extends StatelessWidget {
                   fit: BoxFit.cover,
                 ),
               ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Obx(
-                  () => InkWell(
-                    onTap: () async {
-                      try {
-                        final newValue = !isFavorite.value;
-                        isFavorite.value = newValue; // Optimistic update
-
-                        if (newValue) {
-                          await favoriteController.favorite(itemId);
-                          onFavoriteToggle?.call(true);
-                        } else {
-                          await favoriteController.removeFavorite(itemId);
-                          onFavoriteToggle?.call(false);
-                        }
-                      } catch (e) {
-                        isFavorite.value = !isFavorite.value; // Revert on error
-                        DPrint.log("Favorite toggle error: $e");
-                      }
-                    },
-                    child: CircleAvatar(
-                      radius: 12,
-                      backgroundColor: const Color(0xBD3C84F0),
-                      child: Icon(
-                        isFavorite.value
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: isFavorite.value ? Colors.white : Colors.grey,
-                        size: 16,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              // Positioned(
+              //   top: 8,
+              //   right: 8,
+              //   child: Obx(
+              //     () => InkWell(
+              //       onTap: () async {
+              //         try {
+              //           final newValue = !isFavorite.value;
+              //           isFavorite.value = newValue; // Optimistic update
+              //
+              //           if (newValue) {
+              //             await favoriteController.favorite(itemId);
+              //             onFavoriteToggle?.call(true);
+              //           } else {
+              //             await favoriteController.removeFavorite(itemId);
+              //             onFavoriteToggle?.call(false);
+              //           }
+              //         } catch (e) {
+              //           isFavorite.value = !isFavorite.value; // Revert on error
+              //           DPrint.log("Favorite toggle error: $e");
+              //         }
+              //       },
+              //       child: CircleAvatar(
+              //         radius: 12,
+              //         backgroundColor: const Color(0xBD3C84F0),
+              //         child: Icon(
+              //           isFavorite.value
+              //               ? Icons.favorite
+              //               : Icons.favorite_border,
+              //           color: isFavorite.value ? Colors.white : Colors.grey,
+              //           size: 16,
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
             ],
           ),
 
@@ -108,14 +108,51 @@ class FoodCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                Row(
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Spacer(),
+                    Obx(
+                          () => InkWell(
+                        onTap: () async {
+                          try {
+                            final newValue = !isFavorite.value;
+                            isFavorite.value = newValue; // Optimistic update
+
+                            if (newValue) {
+                              await favoriteController.favorite(itemId);
+                              onFavoriteToggle?.call(true);
+                            } else {
+                              await favoriteController.removeFavorite(itemId);
+                              onFavoriteToggle?.call(false);
+                            }
+                          } catch (e) {
+                            isFavorite.value = !isFavorite.value; // Revert on error
+                            DPrint.log("Favorite toggle error: $e");
+                          }
+                        },
+                        child: CircleAvatar(
+                          radius: 12,
+                          backgroundColor: const Color(0xBD3C84F0),
+                          child: Icon(
+                            isFavorite.value
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: isFavorite.value ? Colors.white : Colors.white,
+                            size: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 4),
                 Text(
