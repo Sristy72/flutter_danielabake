@@ -15,7 +15,7 @@ class WeeklyMenuCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      // clipBehavior: Clip.none,
+       clipBehavior: Clip.none,
       children: [
         /// Main content: Day and menu items
         Container(
@@ -83,21 +83,21 @@ class WeeklyMenuCard extends StatelessWidget {
 
         /// Images on the right – smaller and tighter for reduced height
         Positioned(
-          top: -85, // Slightly less overflow
-          right: 15,
-          child: SizedBox(height: 180, width: 157, child: Image.asset('assets/images/11322202_4731931 32.png')),
+          top: -48, // Slightly less overflow
+          right: 25,
+          child: SizedBox(height: 120, width: 120, child: Image.asset('assets/images/11322202_4731931 32.png')),
         ),
 
         Positioned(
-          top: 20, // Slightly less overflow
-          right: 2,
-          child: SizedBox(height: 180, width: 157, child: Image.asset('assets/images/11322202_4731931 33.png')),
+          top: 28, // Slightly less overflow
+          right: 10,
+          child: SizedBox(height: 135, width: 135, child: Image.asset('assets/images/11322202_4731931 33.png')),
         ),
 
         Positioned(
-          top: 110, // Slightly less overflow
+          top: 105, // Slightly less overflow
           right: 1,
-          child: SizedBox(height: 180, width: 157, child: Image.asset('assets/images/11322202_4731931 34.png')),
+          child: SizedBox(height: 135, width: 135, child: Image.asset('assets/images/11322202_4731931 34.png')),
         ),
       ],
     );

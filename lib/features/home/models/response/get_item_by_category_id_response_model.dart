@@ -1,3 +1,5 @@
+import 'get_item_ingredient.dart';
+
 class GetItemByCategoryIdResponseModel {
   final int total;
   final int page;
@@ -28,7 +30,7 @@ class FoodItem {
   final double price;
   final String image;
   final Category category;
-  final List<Ingredient> ingredients;
+  final List<ItemIngredient> ingredients;
   final double rating;
   final int reviewsCount;
 
@@ -52,8 +54,8 @@ class FoodItem {
       price: (json["price"] as num).toDouble(),
       image: json["image"],
       category: Category.fromJson(json["category"]),
-      ingredients: List<Ingredient>.from(
-        json["ingredients"].map((x) => Ingredient.fromJson(x)),
+      ingredients: List<ItemIngredient>.from(
+        json["ingredients"].map((x) => ItemIngredient.fromJson(x)),
       ),
       rating: (json["rating"] as num).toDouble(),
       reviewsCount: json["reviewsCount"],
@@ -81,19 +83,26 @@ class Category {
   }
 }
 
-class Ingredient {
-  final String name;
-  final bool isAllergen;
+// class ItemIngredient {
+//   final String name;
+//   final bool isAllergen;
+//   final String id;
+//   final String? image;
+//
+//   ItemIngredient({
+//     required this.name,
+//     required this.isAllergen,
+//     required this.id,
+//     this.image,
+//   });
+//
+//   factory ItemIngredient.fromJson(Map<String, dynamic> json) {
+//     return ItemIngredient(
+//       name: json['name'],
+//       isAllergen: json['isAllergen'],
+//       id: json['_id'],
+//       image: json['image'],
+//     );
+//   }
+// }
 
-  Ingredient({
-    required this.name,
-    required this.isAllergen,
-  });
-
-  factory Ingredient.fromJson(Map<String, dynamic> json) {
-    return Ingredient(
-      name: json["name"],
-      isAllergen: json["isAllergen"],
-    );
-  }
-}

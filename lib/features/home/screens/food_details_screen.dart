@@ -194,48 +194,85 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
               ),
             ),
 
-            /// Ingredients Section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: Wrap(
-                spacing: 10,
-                runSpacing: 12,
-                children: IngredientData.allIngredients
-                    .where(
-                      (item) => widget.food.ingredients.contains(item["name"]),
-                    )
-                    .map((item) {
-                      return Column(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(100),
-                              color: const Color(0x2EFFB972),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(18.0),
-                              child: SizedBox(
-                                height: 40,
-                                width: 40,
-                                child: AppSvg(
-                                  asset: item["asset"]!,
-                                  width: 40,
-                                  height: 40,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          Text(
-                            item["name"]!,
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                        ],
-                      );
-                    })
-                    .toList(),
-              ),
+            //add ingredients image and name
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Wrap(
+              spacing: 14,
+              runSpacing: 14,
+              children: widget.food.ingredients.map((ingredient) {
+                return Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: const BoxDecoration(
+                        color: Color(0x2EFFB972),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Image.network(
+                        ingredient.image ?? '',
+                        height: 45,
+                        width: 45,
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) =>
+                        const Icon(Icons.fastfood, size: 30),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      ingredient.name,
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                  ],
+                );
+              }).toList(),
             ),
+          ),
+
+
+
+          // /// Ingredients Section
+            // Padding(
+            //   padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            //   child: Wrap(
+            //     spacing: 10,
+            //     runSpacing: 12,
+            //     children: IngredientData.allIngredients
+            //         .where(
+            //           (item) => widget.food.ingredients.contains(item["name"]),
+            //         )
+            //         .map((item) {
+            //           return Column(
+            //             children: [
+            //               Container(
+            //                 decoration: BoxDecoration(
+            //                   borderRadius: BorderRadius.circular(100),
+            //                   color: const Color(0x2EFFB972),
+            //                 ),
+            //                 child: Padding(
+            //                   padding: const EdgeInsets.all(18.0),
+            //                   child: SizedBox(
+            //                     height: 40,
+            //                     width: 40,
+            //                     child: AppSvg(
+            //                       asset: item["asset"]!,
+            //                       width: 40,
+            //                       height: 40,
+            //                     ),
+            //                   ),
+            //                 ),
+            //               ),
+            //               const SizedBox(height: 5),
+            //               Text(
+            //                 item["name"]!,
+            //                 style: const TextStyle(fontSize: 12),
+            //               ),
+            //             ],
+            //           );
+            //         })
+            //         .toList(),
+            //   ),
+            // ),
 
             const SizedBox(height: 20),
             

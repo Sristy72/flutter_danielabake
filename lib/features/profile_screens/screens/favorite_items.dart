@@ -1,5 +1,4 @@
 import 'package:danielabake/features/home/controller/favorite_food_controller.dart';
-import 'package:danielabake/features/profile_screens/controller/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/common/shimmer/shimmer_loader.dart';

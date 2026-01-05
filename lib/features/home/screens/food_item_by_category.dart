@@ -76,9 +76,7 @@ class _FoodListScreenState extends State<FoodListScreen> {
                       title: food.name,
                       description: food.description,
                       image: food.image,
-                      ingredients: food.ingredients
-                          .map((e) => e.name)
-                          .toList(), price: food.price.toString(), id: food.id, rating: food.rating, reviewsCount: food.reviewsCount,
+                      ingredients: food.ingredients, price: food.price.toString(), id: food.id, rating: food.rating, reviewsCount: food.reviewsCount,
                     ),
                   ));
                 },

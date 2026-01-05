@@ -124,7 +124,7 @@ class _AllPopularItemsState extends State<AllPopularItems> {
                       title: item.name,
                       description: item.description,
                       image: item.image,
-                      ingredients: item.ingredients.map((e) => e.name).toList(),
+                      ingredients: item.ingredients,
                       price: item.price.toString(),
                       id: item.id, rating: item.rating, reviewsCount: item.reviewsCount,
                     ),

@@ -1,10 +1,15 @@
+//import '../../models/response/get_popular_items_response_model.dart';
+
+import '../../models/response/get_item_by_category_id_response_model.dart';
+import '../../models/response/get_item_ingredient.dart';
+
 class FoodModel {
   final String id;
   final String title;
   final String description;
   final String image; // network or asset
   final String price; // network or asset
-  final List<String> ingredients;
+  final List<ItemIngredient> ingredients;
   final double rating;
   final int reviewsCount;
 

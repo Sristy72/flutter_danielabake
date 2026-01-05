@@ -1,3 +1,5 @@
+import 'get_item_ingredient.dart';
+
 class GetPopularItemResponseModel {
   final int total;
   final int page;
@@ -96,22 +98,25 @@ class ItemCategory {
   }
 }
 
-class ItemIngredient {
-  final String name;
-  final bool isAllergen;
-  final String id;
-
-  ItemIngredient({
-    required this.name,
-    required this.isAllergen,
-    required this.id,
-  });
-
-  factory ItemIngredient.fromJson(Map<String, dynamic> json) {
-    return ItemIngredient(
-      name: json['name'],
-      isAllergen: json['isAllergen'],
-      id: json['_id'],
-    );
-  }
-}
+// class ItemIngredient {
+//   final String name;
+//   final bool isAllergen;
+//   final String id;
+//   final String? image;
+//
+//   ItemIngredient({
+//     required this.name,
+//     required this.isAllergen,
+//     required this.id,
+//     this.image,
+//   });
+//
+//   factory ItemIngredient.fromJson(Map<String, dynamic> json) {
+//     return ItemIngredient(
+//       name: json['name'],
+//       isAllergen: json['isAllergen'],
+//       id: json['_id'],
+//       image: json['image'],
+//     );
+//   }
+// }

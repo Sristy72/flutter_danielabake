@@ -76,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
               //   ),
               // ),
 
-              SizedBox(height: rw(context, 0.03)),
+              SizedBox(height: rw(context, 0.06)),
 
               TextWithViewAllButton(
                 text: 'Select by Category',
@@ -115,9 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             title: item.name,
                             description: item.description,
                             image: item.image,
-                            ingredients: item.ingredients
-                                .map((e) => e.name)
-                                .toList(),
+                            ingredients: item.ingredients,
                             price: item.price.toString(),
                             id: item.id, rating: item.rating, reviewsCount: item.reviewsCount,
                           ),

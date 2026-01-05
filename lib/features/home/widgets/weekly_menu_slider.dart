@@ -70,7 +70,7 @@ class _WeeklyMenuSliderState extends State<WeeklyMenuSlider> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 210,
+      height: 180,
       child: Obx(() {
         final weeklyMenu = _controller.weeklyMenuByDay;
 
@@ -79,6 +79,7 @@ class _WeeklyMenuSliderState extends State<WeeklyMenuSlider> {
         }
 
         return PageView.builder(
+          clipBehavior: Clip.none,
           controller: _pageController,
           itemCount: _controller.days.length,
           itemBuilder: (_, index) {

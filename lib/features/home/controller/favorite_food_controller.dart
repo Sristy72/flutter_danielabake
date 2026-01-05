@@ -68,12 +68,18 @@ class FavoriteFoodController extends BaseController {
     result.fold(
           (fail) => setError(fail.message),
           (success) {
-        favoriteItems.assignAll(success.data);
-        // No need for .refresh() — assignAll() does it automatically
+        // ✅ FILTER NULL ITEMS HERE
+        final cleanList = success.data
+            .where((e) => e.item != null)
+            .toList();
+
+        favoriteItems.assignAll(cleanList);
       },
     );
+
     setLoading(false);
   }
+
 
   Future<void> removeFavorite(String itemId) async {
     final userId = await _authStorageService.getUserId();
