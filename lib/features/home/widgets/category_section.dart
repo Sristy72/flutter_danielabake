@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import '../controller/category_controller.dart';
 import '../screens/food_item_by_category.dart';
 import 'category_card.dart';
+import '../../../core/common/shimmer/shimmer_loader.dart';
+import '../../../core/common/shimmer/shimmer_placeholders.dart';
 
 class CategorySection extends StatelessWidget {
   const CategorySection({super.key});
@@ -14,7 +16,15 @@ class CategorySection extends StatelessWidget {
 
     return Obx(() {
       if (controller.isLoading.value) {
-        return const Center(child: CircularProgressIndicator());
+        return SizedBox(
+          height: 160,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: 5,
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            itemBuilder: (context, index) => _buildCategoryShimmer(),
+          ),
+        );
       }
 
       final response = controller.category.value;
@@ -29,7 +39,7 @@ class CategorySection extends StatelessWidget {
         height: 160,
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
-          itemCount: categories.length,       //FIXED
+          itemCount: categories.length, //FIXED
           //padding: const EdgeInsets.symmetric(horizontal: 16),
           separatorBuilder: (_, __) => const SizedBox(width: 12),
           itemBuilder: (context, index) {
@@ -47,16 +57,43 @@ class CategorySection extends StatelessWidget {
                 imageUrl: cat.image,
                 bgColor: Color(cat.bgColor),
                 onTap: () {
-                  Get.to(() => FoodListScreen(
-                    categoryId: cat.id,
-                    categoryName: cat.name,
-                  ));
+                  Get.to(
+                    () => FoodListScreen(
+                      categoryId: cat.id,
+                      categoryName: cat.name,
+                    ),
+                  );
                 },
               );
-            }//FIXED
+            } //FIXED
           },
         ),
       );
     });
+  }
+
+  Widget _buildCategoryShimmer() {
+    return ShimmerLoader(
+      isLoading: true,
+      child: Container(
+        width: 130, // Approximate width of CategoryCard
+        decoration: BoxDecoration(
+          color: Colors.grey.shade200,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ShimmerPlaceholders.circle(diameter: 70),
+            const SizedBox(height: 12),
+            ShimmerPlaceholders.textLine(
+              width: 80,
+              height: 16,
+              borderRadius: 8,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

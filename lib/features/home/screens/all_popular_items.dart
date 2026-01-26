@@ -6,7 +6,6 @@ import 'package:danielabake/features/home/controller/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../Order_screen/controller/order_controller.dart';
-import '../controller/cart_controller.dart';
 import '../widgets/models/detail_food_model.dart';
 import '../widgets/popular_items.dart';
 import 'food_details_screen.dart';
@@ -23,15 +22,15 @@ class _AllPopularItemsState extends State<AllPopularItems> {
   final _favoriteFoodController = Get.find<FavoriteFoodController>();
   final _cartController = Get.find<OrderController>();
 
-
-
   final TextEditingController _searchController = TextEditingController();
   final RxBool _isSearching = false.obs;
   final RxBool _isSearchExpanded = false.obs;
 
   @override
   void initState() {
-    _homeController.fetchAllPopularItem();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _homeController.fetchAllPopularItem();
+    });
     super.initState();
   }
 
@@ -56,16 +55,18 @@ class _AllPopularItemsState extends State<AllPopularItems> {
       appBar: AppBar(
         centerTitle: true,
         elevation: 0,
-        title: Obx(() => _isSearchExpanded.value
-            ? const SizedBox() // Hide title when searching
-            : const Text(
-          'Popular Items',
-          style: TextStyle(
-            fontSize: 19,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
-        )),
+        title: Obx(
+          () => _isSearchExpanded.value
+              ? const SizedBox() // Hide title when searching
+              : const Text(
+                  'All Available Items',
+                  style: TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                ),
+        ),
         actions: [
           Padding(
             padding: EdgeInsets.only(right: screenW * 0.04),
@@ -97,8 +98,22 @@ class _AllPopularItemsState extends State<AllPopularItems> {
               ? _homeController.search.value?.items ?? []
               : _homeController.allPopularItem.value?.items ?? [];
 
+          DPrint.log(
+            'All Popular Items count: ${items.length}, Searching: $searching, Loading: ${_homeController.isLoading.value}',
+          );
+
           if (_homeController.isLoading.value && !searching) {
-            return const Center(child: CircularProgressIndicator());
+            return GridView.builder(
+              padding: const EdgeInsets.all(16),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: gridCount,
+                mainAxisExtent: 255,
+                crossAxisSpacing: width * 0.025,
+                mainAxisSpacing: width * 0.025,
+              ),
+              itemCount: 8,
+              itemBuilder: (context, index) => _buildShimmerCard(),
+            );
           }
 
           if (items.isEmpty) {
@@ -129,17 +144,20 @@ class _AllPopularItemsState extends State<AllPopularItems> {
 
               return GestureDetector(
                 onTap: () {
-                  Get.to(() => FoodDetailScreen(
-                    food: FoodModel(
-                      title: item.name,
-                      description: item.description,
-                      image: item.image,
-                      ingredients: item.ingredients,
-                      price: item.price.toString(),
-                      id: item.id, images: item.images,
-                      //rating: item.rating, reviewsCount: item.reviewsCount,
+                  Get.to(
+                    () => FoodDetailScreen(
+                      food: FoodModel(
+                        title: item.name,
+                        description: item.description,
+                        image: item.image,
+                        ingredients: item.ingredients,
+                        price: item.price.toString(),
+                        id: item.id,
+                        images: item.images,
+                        //rating: item.rating, reviewsCount: item.reviewsCount,
+                      ),
                     ),
-                  ));
+                  );
                 },
 
                 child: FoodCard(
@@ -178,12 +196,109 @@ class _AllPopularItemsState extends State<AllPopularItems> {
                     } catch (e) {
                       DPrint.log("Favorite Error: $e");
                     }
-                  }, rating: item.rating, reviewCount: item.reviewsCount,
+                  },
+                  rating: item.rating,
+                  reviewCount: item.reviewsCount,
                 ),
               );
             },
           );
         }),
+      ),
+    );
+  }
+
+  Widget _buildShimmerCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFDEB8),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            flex: 6,
+            child: Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                color: Color(0xFFFFEAD1),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              ),
+              child: const Icon(Icons.image, size: 40, color: Colors.white70),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 16,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFEAD1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Container(
+                  height: 13,
+                  width: 120,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFEAD1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      height: 18,
+                      width: 60,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFEAD1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Container(
+                          height: 28,
+                          width: 28,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFFEAD1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.favorite_border,
+                            size: 14,
+                            color: Colors.white70,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          height: 36,
+                          width: 36,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFFEAD1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.add_shopping_cart,
+                            size: 16,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

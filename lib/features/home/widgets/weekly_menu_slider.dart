@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/weekly_menu_controller.dart';
 import '../controller/home_controller.dart';
+import '../../../core/common/shimmer/shimmer_loader.dart';
+import '../../../core/common/shimmer/shimmer_placeholders.dart';
 
 class WeeklyMenuSlider extends StatefulWidget {
   const WeeklyMenuSlider({super.key});
@@ -30,7 +32,6 @@ class _WeeklyMenuSliderState extends State<WeeklyMenuSlider> {
     super.initState();
 
     final todayIndex = _getTodayIndex();
-
 
     _currentPage = 1000 + todayIndex;
 
@@ -64,8 +65,12 @@ class _WeeklyMenuSliderState extends State<WeeklyMenuSlider> {
         final weeklyMenu = _controller.weeklyMenuByDay;
 
         if (weeklyMenu.isEmpty) {
-          return const Center(child: CircularProgressIndicator());
+          return PageView.builder(
+            itemCount: 1,
+            itemBuilder: (_, __) => _buildSliderShimmer(),
+          );
         }
+
 
         return PageView.builder(
           controller: _pageController,
@@ -82,4 +87,76 @@ class _WeeklyMenuSliderState extends State<WeeklyMenuSlider> {
       }),
     );
   }
+
+  Widget _buildSliderShimmer() {
+    return Container(
+      width: double.infinity,
+      height: 200,
+      margin: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Color(0xFFFFDEB8),
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Day title placeholder
+          Container(
+            width: 120,
+            height: 22,
+            decoration: BoxDecoration(
+              color: Color(0xFFFFF3E0),
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Image placeholder
+              Container(
+                width: 70,
+                height: 70,
+                decoration: BoxDecoration(
+                  color: Color(0xFFFFF3E0),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+
+              const SizedBox(width: 12),
+
+              // Items placeholder
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _itemPlaceholder(),
+                    const SizedBox(height: 8),
+                    _itemPlaceholder(),
+                    const SizedBox(height: 8),
+                    _itemPlaceholder(width: 140),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _itemPlaceholder({double width = double.infinity}) {
+    return Container(
+      width: width,
+      height: 16,
+      decoration: BoxDecoration(
+        color: Color(0xFFFFF3E0),
+        borderRadius: BorderRadius.circular(8),
+      ),
+    );
+  }
+
 }

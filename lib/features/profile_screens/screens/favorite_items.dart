@@ -24,45 +24,116 @@ class _FavoriteItemsState extends State<FavoriteItems> {
 
   // Build a single shimmer card (same size as real FoodCard)
   Widget _buildShimmerCard() {
-    return ShimmerLoader(
-      isLoading: true,
-      child: Container(
-        //margin: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image placeholder
-            Expanded(
-              flex: 6,
-              child: ShimmerPlaceholders.rectangle(
-                borderRadius: 16,
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFDEB8),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// 🖼 Item Image Placeholder
+          Expanded(
+            flex: 6,
+            child: Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                color: Color(0xFFFFEAD1),
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
+              ),
+              child: const Icon(
+                Icons.image,
+                size: 40,
+                color: Colors.white70,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ShimmerPlaceholders.textLine(height: 16, borderRadius: 8),
-                  const SizedBox(height: 8),
-                  ShimmerPlaceholders.textLine(width: 80, height: 14, borderRadius: 6),
-                  const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      ShimmerPlaceholders.textLine(width: 60, height: 20, borderRadius: 10),
-                      ShimmerPlaceholders.circle(diameter: 40),
-                    ],
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// 🏷 Item Name
+                Container(
+                  height: 16,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFEAD1),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                ],
-              ),
+                ),
+
+                const SizedBox(height: 8),
+
+                /// 📝 Description
+                Container(
+                  height: 13,
+                  width: 120,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFEAD1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    /// 💰 Price
+                    Container(
+                      height: 18,
+                      width: 60,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFEAD1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+
+                    Row(
+                      children: [
+                        /// ❤️ Favorite Icon
+                        Container(
+                          height: 28,
+                          width: 28,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFFEAD1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.favorite_border,
+                            size: 14,
+                            color: Colors.white70,
+                          ),
+                        ),
+
+                        const SizedBox(width: 8),
+
+                        /// 🛒 Add to Cart Button
+                        Container(
+                          height: 36,
+                          width: 36,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFFEAD1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.add_shopping_cart,
+                            size: 16,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

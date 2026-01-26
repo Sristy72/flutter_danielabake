@@ -5,7 +5,6 @@ import 'package:danielabake/features/Order_screen/models/response/get_cart_respo
 import 'package:danielabake/features/Order_screen/models/response/get_order_by_id_response_model.dart';
 import 'package:danielabake/features/Order_screen/repositories/cart_repository.dart';
 import 'package:danielabake/features/Order_screen/repositories/place_order_repo.dart';
-import 'package:danielabake/features/Order_screen/screens/order_screens.dart';
 import 'package:danielabake/features/home/screens/home_screen.dart';
 import 'package:danielabake/navigation_menu.dart';
 import 'package:flutter/material.dart';
@@ -239,8 +238,8 @@ class OrderController extends BaseController {
 
   Future<void> placeOrder(
     String address,
-    String phone, 
-      DateTime scheduledFor,
+    String phone,
+    DateTime scheduledFor,
   ) async {
     final userId = await _authStorageService.getUserId();
     DPrint.log('UserId: $userId');
@@ -253,8 +252,8 @@ class OrderController extends BaseController {
     final request = CheckoutRequestModel(
       userId: userId,
       address: address,
-      phone: phone, scheduledFor: scheduledFor,
-      
+      phone: phone,
+      scheduledFor: scheduledFor,
     );
 
     final result = await _placeOrderRepo.placeOrder(request, userId);
@@ -271,10 +270,7 @@ class OrderController extends BaseController {
     );
   }
 
-
-  Future<void> reOrder(
-      String id
-  ) async {
+  Future<void> reOrder(String id) async {
     final userId = await _authStorageService.getUserId();
     DPrint.log('UserId: $userId');
     if (userId == null || userId.isEmpty) {
@@ -283,9 +279,7 @@ class OrderController extends BaseController {
       return;
     }
 
-    final request = ReOrderRequestModel(
-      userId: userId,
-    );
+    final request = ReOrderRequestModel(userId: userId);
 
     final result = await _placeOrderRepo.reOrder(request, id);
 

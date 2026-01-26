@@ -8,6 +8,8 @@ import 'package:danielabake/features/home/screens/all_popular_items.dart';
 import 'package:danielabake/features/home/widgets/category_section.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../core/common/shimmer/shimmer_loader.dart';
+import '../../../core/common/shimmer/shimmer_placeholders.dart';
 
 import '../../../core/common/widgets/cart.dart';
 import '../../Order_screen/controller/order_controller.dart';
@@ -200,8 +202,20 @@ class _HomeScreenState extends State<HomeScreen> {
               Obx(() {
                 final data = _homeController.popularItem.value;
 
-                if (data == null) {
-                  return const Center(child: CircularProgressIndicator());
+                if (_homeController.isLoading.value || data == null) {
+                  return GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: gridCount,
+                      mainAxisExtent: 255,
+                      crossAxisSpacing: width * 0.025,
+                      mainAxisSpacing: width * 0.025,
+                    ),
+                    itemCount: 6,
+                    itemBuilder: (context, index) => _buildShimmerCard(),
+                  );
                 }
 
                 if (data.items.isEmpty) {
@@ -344,5 +358,120 @@ class _HomeScreenState extends State<HomeScreen> {
       'Sunday': 'sun',
     };
     return map[name]!;
+  }
+
+  Widget _buildShimmerCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFDEB8),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /// 🖼 Item Image Placeholder
+          Expanded(
+            flex: 6,
+            child: Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                color: Color(0xFFFFEAD1),
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(16),
+                ),
+              ),
+              child: const Icon(
+                Icons.image,
+                size: 40,
+                color: Colors.white70,
+              ),
+            ),
+          ),
+
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// 🏷 Item Name
+                Container(
+                  height: 16,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFEAD1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                /// 📝 Description
+                Container(
+                  height: 13,
+                  width: 120,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFEAD1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    /// 💰 Price
+                    Container(
+                      height: 18,
+                      width: 60,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFEAD1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+
+                    Row(
+                      children: [
+                        /// ❤️ Favorite Icon
+                        Container(
+                          height: 28,
+                          width: 28,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFFEAD1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.favorite_border,
+                            size: 14,
+                            color: Colors.white70,
+                          ),
+                        ),
+
+                        const SizedBox(width: 8),
+
+                        /// 🛒 Add to Cart Button
+                        Container(
+                          height: 36,
+                          width: 36,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFFFEAD1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.add_shopping_cart,
+                            size: 16,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
