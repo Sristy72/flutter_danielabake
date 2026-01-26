@@ -39,6 +39,8 @@ class _OrderScreensState extends State<OrderScreens> {
       ),
       body: Column(
         children: [
+
+          Text('You can\'t order for today', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),),
           // Cart Items Section
           Expanded(
             child: Obx(() {

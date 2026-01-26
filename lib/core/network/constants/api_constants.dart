@@ -91,6 +91,7 @@ class OrderEndpoints {
   String fetchCart(String userId) => '${ApiConstants.baseUrl}/cart/$userId';
   String fetchOrder = '${ApiConstants.baseUrl}/orders/my';
   String placeOrder = '${ApiConstants.baseUrl}/orders';
+  String reOrder(String id) => '${ApiConstants.baseUrl}/orders/$id/reorder';
   // String fetchCategory(String userId) =>;
 }
 

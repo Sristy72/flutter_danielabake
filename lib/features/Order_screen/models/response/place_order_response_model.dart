@@ -11,9 +11,9 @@ class OrderItem {
 
   factory OrderItem.fromJson(Map<String, dynamic> json) {
     return OrderItem(
-      item: json['item'] ?? "",
+      item: json['item'] ?? '',
       quantity: json['quantity'] ?? 0,
-      id: json['_id'] ?? "",
+      id: json['_id'] ?? '',
     );
   }
 
@@ -26,6 +26,7 @@ class OrderItem {
   }
 }
 
+
 class PlaceOrderResponseModel {
   final String user;
   final List<OrderItem> items;
@@ -34,10 +35,11 @@ class PlaceOrderResponseModel {
   final String phone;
   final String status;
   final String paymentStatus;
+  final DateTime? scheduledFor;
   final String estimatedDelivery;
   final String id;
-  final String createdAt;
-  final String updatedAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
   final int v;
 
   PlaceOrderResponseModel({
@@ -48,6 +50,7 @@ class PlaceOrderResponseModel {
     required this.phone,
     required this.status,
     required this.paymentStatus,
+    required this.scheduledFor,
     required this.estimatedDelivery,
     required this.id,
     required this.createdAt,
@@ -57,20 +60,23 @@ class PlaceOrderResponseModel {
 
   factory PlaceOrderResponseModel.fromJson(Map<String, dynamic> json) {
     return PlaceOrderResponseModel(
-      user: json['user'] ?? "",
+      user: json['user'] ?? '',
       items: (json['items'] as List<dynamic>?)
           ?.map((e) => OrderItem.fromJson(e))
           .toList() ??
           [],
       totalAmount: (json['totalAmount'] ?? 0).toDouble(),
-      address: json['address'] ?? "",
-      phone: json['phone'] ?? "",
-      status: json['status'] ?? "",
-      paymentStatus: json['paymentStatus'] ?? "",
-      estimatedDelivery: json['estimatedDelivery'] ?? "",
-      id: json['_id'] ?? "",
-      createdAt: json['createdAt'] ?? "",
-      updatedAt: json['updatedAt'] ?? "",
+      address: json['address'] ?? '',
+      phone: json['phone'] ?? '',
+      status: json['status'] ?? '',
+      paymentStatus: json['paymentStatus'] ?? '',
+      scheduledFor: json['scheduledFor'] != null
+          ? DateTime.parse(json['scheduledFor'])
+          : null,
+      estimatedDelivery: json['estimatedDelivery'] ?? '',
+      id: json['_id'] ?? '',
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: DateTime.parse(json['updatedAt']),
       v: json['__v'] ?? 0,
     );
   }
@@ -84,11 +90,14 @@ class PlaceOrderResponseModel {
       'phone': phone,
       'status': status,
       'paymentStatus': paymentStatus,
+      if (scheduledFor != null)
+        'scheduledFor': scheduledFor!.toIso8601String(),
       'estimatedDelivery': estimatedDelivery,
       '_id': id,
-      'createdAt': createdAt,
-      'updatedAt': updatedAt,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
       '__v': v,
     };
   }
 }
+

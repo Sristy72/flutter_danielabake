@@ -18,7 +18,11 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
+  final TextEditingController dateController = TextEditingController();
+  final TextEditingController timeController = TextEditingController();
   final orderController = Get.find<OrderController>();
+  DateTime? selectedDate;
+  TimeOfDay? selectedTime;
 
   @override
   void initState() {
@@ -27,8 +31,122 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
   }
 
   Future<void> _submit() async {
-     if (!_formKey.currentState!.validate()) return;
-    orderController.placeOrder(addressController.text, phoneController.text);
+    if (!_formKey.currentState!.validate()) return;
+    if (selectedDate == null) {
+      Get.snackbar('Error', 'Please select a delivery date');
+      return;
+    }
+
+    String timeText = timeController.text.toLowerCase().trim();
+    int? totalMinutes;
+
+    if (timeText.contains("hr") || timeText.contains("hour")) {
+      String numericPart = timeText.replaceAll(RegExp(r'[a-z]'), '').trim();
+      double? hours = double.tryParse(numericPart);
+      if (hours != null) {
+        totalMinutes = (hours * 60).toInt();
+      }
+    } else {
+      String numericPart = timeText.replaceAll(RegExp(r'[a-z]'), '').trim();
+      totalMinutes = int.tryParse(numericPart);
+    }
+
+    if (totalMinutes == null || totalMinutes < 30) {
+      Get.snackbar(
+        'Invalid Time',
+        'Minimum delivery time is 30 mins. Please use formats like "30" or "1 hr"',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
+    final now = DateTime.now();
+    final calculatedTime = now.add(Duration(minutes: totalMinutes));
+
+    // Combine the date from selectedDate with the time part calculated from duration
+    final scheduledFor = DateTime(
+      selectedDate!.year,
+      selectedDate!.month,
+      selectedDate!.day,
+      calculatedTime.hour,
+      calculatedTime.minute,
+    );
+
+    orderController.placeOrder(
+      addressController.text,
+      phoneController.text,
+      scheduledFor,
+    );
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    final now = DateTime.now();
+    final isAfter11AM = now.hour >= 11;
+    final tomorrow = now.add(const Duration(days: 1));
+    final firstSelectableDate = now.add(Duration(days: isAfter11AM ? 2 : 1));
+
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: null,
+      helpText: "You can't order for tomorrow after 11:00 AM",
+      firstDate: firstSelectableDate,
+      lastDate: now.add(const Duration(days: 30)),
+      selectableDayPredicate: (DateTime day) {
+        // Disable Today
+        if (day.year == now.year &&
+            day.month == now.month &&
+            day.day == now.day) {
+          return false;
+        }
+        // Disable Saturday (6) and Sunday (7)
+        if (day.weekday == DateTime.saturday ||
+            day.weekday == DateTime.sunday) {
+          return false;
+        }
+        // Disable Tomorrow if after 11 AM
+        if (isAfter11AM) {
+          if (day.year == tomorrow.year &&
+              day.month == tomorrow.month &&
+              day.day == tomorrow.day) {
+            return false;
+          }
+        }
+        return true;
+      },
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFFAD653F),
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Flexible(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    child!, // This is the DatePickerDialog
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (picked != null && picked != selectedDate) {
+      setState(() {
+        selectedDate = picked;
+        dateController.text =
+            "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+      });
+    }
   }
 
   @override
@@ -122,6 +240,7 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
                         ),
                       ),
                     ),
+
                     _divider(),
                     _buildTile(
                       imagePath: Images.phone,
@@ -137,13 +256,72 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
                         ),
                       ),
                     ),
+
+                    _divider(),
+                    _buildTile(
+                      imagePath: Images.calendar,
+                      title: "Delivery Date",
+                      child: InkWell(
+                        onTap: () => _selectDate(context),
+                        child: TextFormField(
+                          enabled: false,
+                          controller: dateController,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black,
+                          ),
+                          decoration: const InputDecoration(
+                            hintText: "Select delivery date",
+                            hintStyle: TextStyle(color: Colors.grey),
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+                    ),
+
                     _divider(),
                     _buildTile(
                       imagePath: Images.delivery,
-                      title: "Estimated Delivery Time",
-                      child: const Text(
-                        "1hr",
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      title: "Delivery Time",
+                      child: TextFormField(
+                        controller: timeController,
+                        keyboardType: TextInputType.text,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Please enter delivery time";
+                          }
+                          String timeText = value.toLowerCase().trim();
+                          int? totalMinutes;
+
+                          if (timeText.contains("hr") ||
+                              timeText.contains("hour")) {
+                            String numericPart = timeText
+                                .replaceAll(RegExp(r'[a-z]'), '')
+                                .trim();
+                            double? hours = double.tryParse(numericPart);
+                            if (hours != null) {
+                              totalMinutes = (hours * 60).toInt();
+                            }
+                          } else {
+                            String numericPart = timeText
+                                .replaceAll(RegExp(r'[a-z]'), '')
+                                .trim();
+                            totalMinutes = int.tryParse(numericPart);
+                          }
+
+                          if (totalMinutes == null) {
+                            return "Invalid format (e.g. 30 mins, 1 hr)";
+                          }
+                          if (totalMinutes < 30) {
+                            return "Minimum duration is 30 mins";
+                          }
+                          return null;
+                        },
+                        decoration: const InputDecoration(
+                          hintText: "e.g. 30 mins or 1 hr",
+                          hintStyle: TextStyle(color: Colors.grey),
+                          border: InputBorder.none,
+                        ),
                       ),
                     ),
                   ],

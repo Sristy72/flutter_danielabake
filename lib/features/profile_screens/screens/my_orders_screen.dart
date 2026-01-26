@@ -128,7 +128,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
   Widget _buildOrderCard(dynamic order, {bool isCompleted = false}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 8),
       decoration: BoxDecoration(
         color: Colors.orange.withOpacity(0.1),
         borderRadius: BorderRadius.circular(16),
@@ -259,6 +259,23 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
               ),
             ],
           ),
+
+          if (isCompleted)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => orderController.reOrder(order.id),
+                  child: Text(
+                    'Reorder',
+                    style: TextStyle(
+                      color: Colors.green.shade700,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
         ],
       ),
     );

@@ -2,6 +2,8 @@
 import 'package:danielabake/core/network/api_client.dart';
 import 'package:danielabake/core/network/constants/api_constants.dart';
 import 'package:danielabake/core/network/network_result.dart';
+import 'package:danielabake/features/Order_screen/models/request/re_order_request_model.dart';
+import 'package:danielabake/features/Order_screen/models/response/reorder_response_model.dart';
 import 'package:danielabake/features/Order_screen/repositories/place_order_repo.dart';
 import '../models/request/place_order_request_model.dart';
 import '../models/response/place_order_response_model.dart';
@@ -17,6 +19,15 @@ class PlaceOrderRepoImpl implements PlaceOrderRepo {
       endpoint: ApiConstants.order.placeOrder,
       data: request.toJson(),
       fromJsonT: (json) => PlaceOrderResponseModel.fromJson(json),
+    );
+  }
+
+  @override
+  NetworkResult<ReorderResponseModel> reOrder(ReOrderRequestModel request, String id){
+    return _apiClient.post(
+      endpoint: ApiConstants.order.reOrder(id),
+      data: request.toJson(),
+      fromJsonT: (json) => ReorderResponseModel.fromJson(json),
     );
   }
 }

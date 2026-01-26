@@ -33,6 +33,7 @@ class Images {
   static const String address = '$_base1/address.svg';
   static const String phone = '$_base1/phone.svg';
   static const String delivery = '$_base1/delivery.svg';
+  static const String calendar = '$_base1/calendar.svg';
   static const String broccoli = '$_base1/broccoli.svg';
   static const String chicken = '$_base1/chicken.svg';
   static const String garlic = '$_base1/garlic.svg';

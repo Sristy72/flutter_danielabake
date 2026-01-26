@@ -1,9 +1,11 @@
 import 'dart:developer' as DPrint;
 import 'package:danielabake/features/Order_screen/models/request/place_order_request_model.dart';
+import 'package:danielabake/features/Order_screen/models/request/re_order_request_model.dart';
 import 'package:danielabake/features/Order_screen/models/response/get_cart_response_model.dart';
 import 'package:danielabake/features/Order_screen/models/response/get_order_by_id_response_model.dart';
 import 'package:danielabake/features/Order_screen/repositories/cart_repository.dart';
 import 'package:danielabake/features/Order_screen/repositories/place_order_repo.dart';
+import 'package:danielabake/features/Order_screen/screens/order_screens.dart';
 import 'package:danielabake/features/home/screens/home_screen.dart';
 import 'package:danielabake/navigation_menu.dart';
 import 'package:flutter/material.dart';
@@ -20,11 +22,12 @@ class OrderController extends BaseController {
   final AuthStorageService _authStorageService = AuthStorageService();
 
   final Rxn<GetCartResponseModel> cart = Rxn<GetCartResponseModel>();
-  final Rxn<GetOrderByIdResponseModel> ongoingOrder = Rxn<GetOrderByIdResponseModel>();
-  final Rxn<GetOrderByIdResponseModel> completedOrder = Rxn<GetOrderByIdResponseModel>();
+  final Rxn<GetOrderByIdResponseModel> ongoingOrder =
+      Rxn<GetOrderByIdResponseModel>();
+  final Rxn<GetOrderByIdResponseModel> completedOrder =
+      Rxn<GetOrderByIdResponseModel>();
 
   final _addCartRepo = Get.find<CartRepository>();
-
 
   // final Rxn<OngoingOrderResponseModel> ongoingOrder = Rxn<OngoingOrderResponseModel>();
   // final MultiFormDataManager _multiFormDataManager = MultiFormDataManager();
@@ -70,19 +73,28 @@ class OrderController extends BaseController {
       return;
     }
 
-    final request = AddItemRequest(userId: userId, itemId: itemId, quantity: quantity);
+    final request = AddItemRequest(
+      userId: userId,
+      itemId: itemId,
+      quantity: quantity,
+    );
 
     setLoading(true); // optional: show loading
 
-    final result = await _addCartRepo.addCart(request, userId, itemId, quantity);
+    final result = await _addCartRepo.addCart(
+      request,
+      userId,
+      itemId,
+      quantity,
+    );
 
     result.fold(
-          (fail) {
+      (fail) {
         setError(fail.message);
         Get.snackbar('Error', fail.message);
         setLoading(false);
       },
-          (success) async {
+      (success) async {
         // SUCCESS: Now refresh the cart locally
         // Get.snackbar(
         //   "Success",
@@ -113,7 +125,6 @@ class OrderController extends BaseController {
     );
   }
 
-
   Future<void> removeCart(String itemId) async {
     final userId = await _authStorageService.getUserId();
     if (userId == null || userId.isEmpty) {
@@ -124,7 +135,9 @@ class OrderController extends BaseController {
     // 1. Optimistically remove from UI IMMEDIATELY
     final currentCart = cart.value;
     if (currentCart != null) {
-      final removedItem = currentCart.items.firstWhereOrNull((e) => e.item?.id == itemId);
+      final removedItem = currentCart.items.firstWhereOrNull(
+        (e) => e.item?.id == itemId,
+      );
       if (removedItem != null) {
         currentCart.items.removeWhere((e) => e.item?.id == itemId);
         cart.refresh(); // This triggers instant rebuild in Obx(() => CartItemCard)
@@ -143,7 +156,7 @@ class OrderController extends BaseController {
     final result = await _addCartRepo.removeCart(request, userId, itemId);
 
     result.fold(
-          (fail) {
+      (fail) {
         // API FAILED → Show error + restore item (optional but safe)
         Get.snackbar(
           "Failed",
@@ -155,14 +168,14 @@ class OrderController extends BaseController {
         // Optional: Restore the item if API failed
         // await fetchCart(); // safest way to sync
       },
-          (success) {
+      (success) {
         // API succeeded → already removed optimistically → do nothing
         DPrint.log("Item removed from server successfully");
       },
     );
   }
 
-  Future<void> removeOneItemFromCart(String itemId)async{
+  Future<void> removeOneItemFromCart(String itemId) async {
     final userId = await _authStorageService.getUserId();
     DPrint.log('UserId: $userId');
     if (userId == null || userId.isEmpty) {
@@ -172,15 +185,19 @@ class OrderController extends BaseController {
       return;
     }
     final request = RemoveCartRequestModel(userId: userId, itemId: itemId);
-    final result = await _addCartRepo.removeOneCartItem(request, userId, itemId);
+    final result = await _addCartRepo.removeOneCartItem(
+      request,
+      userId,
+      itemId,
+    );
 
     result.fold(
-          (fail) {
+      (fail) {
         setError(fail.message);
         DPrint.log("Favorite success result : ${fail.message}");
         setLoading(false);
       },
-          (success) {
+      (success) {
         DPrint.log("Favorite success result : ${success.message}");
         Get.snackbar(
           "Success",
@@ -220,7 +237,11 @@ class OrderController extends BaseController {
     );
   }
 
-  Future<void> placeOrder(String address, String phone) async {
+  Future<void> placeOrder(
+    String address,
+    String phone, 
+      DateTime scheduledFor,
+  ) async {
     final userId = await _authStorageService.getUserId();
     DPrint.log('UserId: $userId');
     if (userId == null || userId.isEmpty) {
@@ -229,18 +250,57 @@ class OrderController extends BaseController {
       return;
     }
 
-    final request = CheckoutRequestModel(userId: userId, address: address, phone: phone
+    final request = CheckoutRequestModel(
+      userId: userId,
+      address: address,
+      phone: phone, scheduledFor: scheduledFor,
+      
     );
 
     final result = await _placeOrderRepo.placeOrder(request, userId);
 
     result.fold(
-          (fail) {
+      (fail) {
         setError(fail.message);
         DPrint.log("Place Order success result : ${fail.message}");
       },
-          (success) {
+      (success) {
         DPrint.log("Place order result : ${success.data.id}");
+        Get.offAll(() => NavigationMenu());
+      },
+    );
+  }
+
+
+  Future<void> reOrder(
+      String id
+  ) async {
+    final userId = await _authStorageService.getUserId();
+    DPrint.log('UserId: $userId');
+    if (userId == null || userId.isEmpty) {
+      setError('User ID not found. Please log in again.');
+      Get.snackbar('Error', 'User ID not found. Please log in again.');
+      return;
+    }
+
+    final request = ReOrderRequestModel(
+      userId: userId,
+    );
+
+    final result = await _placeOrderRepo.reOrder(request, id);
+
+    result.fold(
+      (fail) {
+        setError(fail.message);
+        DPrint.log("Place Order success result : ${fail.message}");
+      },
+      (success) {
+        DPrint.log("Place order result : ${success.data.id}");
+        Get.snackbar(
+          "Success",
+          "Item added to the cart",
+          snackPosition: SnackPosition.BOTTOM,
+        );
         Get.offAll(() => NavigationMenu());
       },
     );
