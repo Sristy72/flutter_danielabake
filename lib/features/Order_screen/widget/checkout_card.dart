@@ -63,12 +63,14 @@ class CheckoutCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      item.description, // optional subtitle
-                      style: TextStyle(
+                      item.description,
+                      style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w400,
                         color: Color(0xFF7F3615),
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),

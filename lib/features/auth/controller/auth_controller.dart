@@ -108,7 +108,7 @@ class AuthController extends BaseController {
         }
 
         // Navigate to home screen
-        Get.to(() => NavigationMenu());
+        Get.offAll(() => NavigationMenu());
       },
     );
   }

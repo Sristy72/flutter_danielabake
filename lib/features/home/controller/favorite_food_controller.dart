@@ -45,11 +45,11 @@ class FavoriteFoodController extends BaseController {
       },
           (success) {
         DPrint.log("Favorite success result : ${success.data.id}");
-        Get.snackbar(
-          "Success",
-          "Item added to your favorites",
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        // Get.snackbar(
+        //   "Success",
+        //   "Item added to your favorites",
+        //   snackPosition: SnackPosition.BOTTOM,
+        // );
       },
     );
   }

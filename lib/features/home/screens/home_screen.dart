@@ -11,7 +11,7 @@ import 'package:get/get.dart';
 
 import '../../../core/common/widgets/cart.dart';
 import '../../Order_screen/controller/order_controller.dart';
-import '../widgets/grid_layout.dart';
+import '../widgets/dropdown_with_button.dart';
 import '../widgets/models/detail_food_model.dart';
 import '../widgets/popular_items.dart';
 import '../widgets/responsive.dart';
@@ -30,8 +30,28 @@ class _HomeScreenState extends State<HomeScreen> {
   final _favoriteFoodController = Get.find<FavoriteFoodController>();
   final _cartController = Get.find<OrderController>();
 
+  final RxString selectedDay = 'Today'.obs;
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _homeController.fetchPopularItem(mapDayForApi('Today'));
+      _homeController.fetchWeeklyMenu();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final width = size.width;
+
+    int gridCount = width > 900
+        ? 4
+        : width > 650
+        ? 3
+        : 2;
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -40,13 +60,8 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 20),
-            child: Row(
-              children: [
-                const SizedBox(width: 16),
-                const Cart(),
-              ],
-            ),
-          )
+            child: Row(children: [const SizedBox(width: 16), const Cart()]),
+          ),
         ],
       ),
       body: SingleChildScrollView(
@@ -56,25 +71,14 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               //SizedBox(height: rw(context, 0.03)),
-
-              Text('Weekly Menu', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+              Text(
+                'Weekly Menu',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+              ),
               //Add slider here
               SizedBox(height: rw(context, 0.02)),
 
               const WeeklyMenuSlider(),
-
-              // /// Responsive Banner
-              // GestureDetector(
-              //   onTap: () {},
-              //   child: SizedBox(
-              //     height: rw(context, 0.50), // FIXED for all screens
-              //     width: double.infinity,
-              //     child: Image.asset(
-              //       Images.discount,
-              //       fit: BoxFit.cover,
-              //     ),
-              //   ),
-              // ),
 
               SizedBox(height: rw(context, 0.06)),
 
@@ -86,12 +90,111 @@ class _HomeScreenState extends State<HomeScreen> {
 
               SizedBox(height: rw(context, 0.05)),
 
-              TextWithViewAllButton(
-                text: 'Today\'s Items',
+              DropdownWithButton(
+                onDayChanged: (value) {
+                  if (value != null) {
+                    selectedDay.value = value; // Track the day name
+                    final apiDay = mapDayForApi(value);
+                    _homeController.fetchPopularItem(apiDay);
+                  }
+                },
                 onTap: () => Get.to(() => AllPopularItems()),
               ),
 
+              // TextWithViewAllButton(
+              //           text: 'Today\'s Items',
+              //           onTap: () => Get.to(() => AllPopularItems()),
+              //         ),
               SizedBox(height: rw(context, 0.03)),
+
+              /// Popular Items Grid
+              // Obx(() {
+              //   final selected = selectedDay.value; // "Today", "Monday", etc.
+              //
+              //   // Get today's full name
+              //   String todayName = _controller.days[DateTime.now().weekday - 1];
+              //
+              //   // Determine which day to show
+              //   final dayToShow = selected == 'Today' ? todayName : selected;
+              //
+              //   // Get items for that day
+              //   final filteredItems = _controller.weeklyMenuByDay[dayToShow] ?? [];
+              //
+              //   if (filteredItems.isEmpty) {
+              //     return const Center(child: Text("No items available"));
+              //   }
+              //
+              //   return GridView.builder(
+              //     shrinkWrap: true,
+              //     physics: const NeverScrollableScrollPhysics(),
+              //     padding: const EdgeInsets.symmetric(horizontal: 4),
+              //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              //       crossAxisCount: gridCount,
+              //       mainAxisExtent: 255,
+              //       crossAxisSpacing: width * 0.025,
+              //       mainAxisSpacing: width * 0.025,
+              //     ),
+              //     itemCount: filteredItems.length,
+              //     itemBuilder: (_, index) {
+              //       final item = filteredItems[index];
+              //       final isFavorite = false.obs;
+              //
+              //       return GestureDetector(
+              //         onTap: () {
+              //           Get.to(() => FoodDetailScreen(
+              //             food: FoodModel(
+              //               title: item.name,
+              //               description: item.description,
+              //               image: item.image,
+              //               ingredients: item.ingredients,
+              //               price: item.price.toString(),
+              //               id: item.id,
+              //               images: item.images,
+              //             ),
+              //           ));
+              //         },
+              //         child: FoodCard(
+              //           imagePath: item.image,
+              //           title: item.name,
+              //           description: item.description,
+              //           price: item.price.toString(),
+              //           itemId: item.id,
+              //           isFavorite: isFavorite,
+              //           onAdd: () async {
+              //             try {
+              //               await _cartController.addCart(item.id, 1);
+              //               Get.snackbar(
+              //                 'Success',
+              //                 '${item.name} added to cart',
+              //                 backgroundColor: Colors.green,
+              //                 colorText: Colors.white,
+              //                 margin: const EdgeInsets.all(12),
+              //                 duration: const Duration(seconds: 2),
+              //               );
+              //             } catch (e) {
+              //               Get.snackbar('Error', 'Failed to add ${item.name} to cart');
+              //             }
+              //           },
+              //           onFavoriteToggle: (newValue) async {
+              //             try {
+              //               if (newValue) {
+              //                 await _favoriteFoodController.favorite(item.id);
+              //                 isFavorite.value = true;
+              //               } else {
+              //                 await _favoriteFoodController.removeFavorite(item.id);
+              //                 isFavorite.value = false;
+              //               }
+              //             } catch (e) {
+              //               DPrint.log("Favorite toggle error: $e");
+              //             }
+              //           },
+              //           rating: item.rating,
+              //           reviewCount: item.reviewsCount,
+              //         ),
+              //       );
+              //     },
+              //   );
+              // }),
 
               /// Popular Items Grid
               Obx(() {
@@ -101,25 +204,55 @@ class _HomeScreenState extends State<HomeScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
 
-                return GridLayout(
-                  // mainAxisExtent: MediaQuery.of(context).size.height * 0.30, // smaller height
+                if (data.items.isEmpty) {
+                  final day = selectedDay.value == 'Today'
+                      ? DropdownWithButton.weekdays[DateTime.now().weekday - 1]
+                      : selectedDay.value;
+
+                  String message = "No items available";
+                  if (day == 'Saturday') {
+                    message = "No item available on saturday";
+                  } else if (day == 'Sunday') {
+                    message = "No items available on sunday";
+                  }
+
+                  return Center(child: Text(message));
+                }
+
+                return GridView.builder(
+                  shrinkWrap: true,
+                  // ← Required #1
+                  physics: const NeverScrollableScrollPhysics(),
+                  // ← Required #2 (disable inner scroll)
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  // optional, looks better
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: gridCount,
+                    mainAxisExtent: 255,
+                    crossAxisSpacing: width * 0.025,
+                    mainAxisSpacing: width * 0.025,
+                  ),
                   itemCount: data.items.length,
                   itemBuilder: (_, index) {
                     final item = data.items[index];
-                    final isFavorite = false.obs;
+                    final isFavorite = false
+                        .obs; // ← consider moving this outside if you want real favorite state
 
                     return GestureDetector(
                       onTap: () {
-                        Get.to(() => FoodDetailScreen(
-                          food: FoodModel(
-                            title: item.name,
-                            description: item.description,
-                            image: item.image,
-                            ingredients: item.ingredients,
-                            price: item.price.toString(),
-                            id: item.id, rating: item.rating, reviewsCount: item.reviewsCount,
+                        Get.to(
+                          () => FoodDetailScreen(
+                            food: FoodModel(
+                              title: item.name,
+                              description: item.description,
+                              image: item.image,
+                              ingredients: item.ingredients,
+                              price: item.price.toString(),
+                              id: item.id,
+                              images: item.images,
+                            ),
                           ),
-                        ));
+                        );
                       },
                       child: FoodCard(
                         imagePath: item.image,
@@ -131,13 +264,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         onAdd: () async {
                           try {
                             await _cartController.addCart(item.id, 1);
-                            Get.snackbar('Success', '${item.name} added to cart', backgroundColor: Colors.green,
-                                  colorText: Colors.white,
-                                  margin: const EdgeInsets.all(12),
-                                  duration: const Duration(seconds: 2),);
+                            Get.snackbar(
+                              'Success',
+                              '${item.name} added to cart',
+                              backgroundColor: Colors.green,
+                              colorText: Colors.white,
+                              margin: const EdgeInsets.all(12),
+                              duration: const Duration(seconds: 2),
+                            );
                           } catch (e) {
                             Get.snackbar(
-                                'Error', 'Failed to add ${item.name} to cart');
+                              'Error',
+                              'Failed to add ${item.name} to cart',
+                            );
                           }
                         },
                         onFavoriteToggle: (newValue) async {
@@ -146,14 +285,17 @@ class _HomeScreenState extends State<HomeScreen> {
                               await _favoriteFoodController.favorite(item.id);
                               isFavorite.value = true;
                             } else {
-                              await _favoriteFoodController
-                                  .removeFavorite(item.id);
+                              await _favoriteFoodController.removeFavorite(
+                                item.id,
+                              );
                               isFavorite.value = false;
                             }
                           } catch (e) {
                             DPrint.log("Favorite toggle error: $e");
                           }
-                        }, rating: item.rating, reviewCount: item.reviewsCount,
+                        },
+                        rating: item.rating,
+                        reviewCount: item.reviewsCount,
                       ),
                     );
                   },
@@ -166,5 +308,41 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
+  }
+
+  String mapDayForApi(String day) {
+    final now = DateTime.now();
+
+    if (day == 'Today') {
+      return _weekdayToApi(now.weekday);
+    }
+
+    return _weekdayNameToApi(day);
+  }
+
+  String _weekdayToApi(int weekday) {
+    const map = {
+      1: 'mon',
+      2: 'tue',
+      3: 'wed',
+      4: 'thu',
+      5: 'fri',
+      6: 'sat',
+      7: 'sun',
+    };
+    return map[weekday]!;
+  }
+
+  String _weekdayNameToApi(String name) {
+    const map = {
+      'Monday': 'mon',
+      'Tuesday': 'tue',
+      'Wednesday': 'wed',
+      'Thursday': 'thu',
+      'Friday': 'fri',
+      'Saturday': 'sat',
+      'Sunday': 'sun',
+    };
+    return map[name]!;
   }
 }

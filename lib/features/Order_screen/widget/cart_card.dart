@@ -96,9 +96,12 @@ class CartItemCard extends StatelessWidget {
                           Text(
                             item.description,
                             style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xFF7F3615)),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w400,
+                              color: Color(0xFF7F3615),
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),

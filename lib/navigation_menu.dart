@@ -20,7 +20,7 @@ class NavigationMenu extends StatelessWidget {
 
       bottomNavigationBar: Obx(
             () => Container(
-          margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 22),
+          margin: const EdgeInsets.symmetric(horizontal: 30, vertical: 17),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
             color: const Color(0xFFFFF3E8),

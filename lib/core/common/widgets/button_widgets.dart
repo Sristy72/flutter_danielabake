@@ -43,12 +43,12 @@ class PrimaryButton extends StatelessWidget {
               try {
                 await onApiPressed!();
               } catch (e) {
-                Get.snackbar(
-                  "Error",
-                  e.toString(),
-                  backgroundColor: Colors.red[600],
-                  colorText: Colors.white,
-                );
+                // Get.snackbar(
+                //   "Error",
+                //   e.toString(),
+                //   backgroundColor: Colors.red[600],
+                //   colorText: Colors.white,
+                // );
               } finally {
                 isLoading.value = false;
                 // Optional: auto cleanup after 10 sec

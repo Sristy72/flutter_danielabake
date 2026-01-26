@@ -27,6 +27,9 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
   final _orderController = Get.find<OrderController>();
   final ratingController = Get.find<RatingController>();
   final AuthStorageService _authStorageService = AuthStorageService();
+  final RxString selectedImage = ''.obs;
+
+
 
   final Rx<String?> currentUserId = Rx<String?>(null);
   final RxInt quantity = 0.obs;
@@ -34,6 +37,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
   @override
   void initState() {
     super.initState();
+    selectedImage.value = widget.food.image;
     _initializeQuantity();
     ratingController.getReview(widget.food.id);
     _loadCurrentUserId();// Fetch reviews
@@ -131,9 +135,24 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                 const SizedBox(height: 15),
 
                 PrimaryButton(
-                  text: 'Place Order',
-                  key: Key("food-details-screen"),
-                  onSimplePressed: () => Get.to(() => Checkout2Screen()),
+                    text: 'Place Order',
+                    key: const Key("food-details-screen"),
+                    onSimplePressed: () {
+                      if (quantity.value == 0) {
+                        Get.snackbar(
+                          'No Item Added',
+                          'First add an item to place your order',
+                          snackPosition: SnackPosition.BOTTOM,
+                          backgroundColor: Colors.white24,
+                          colorText: Colors.black,
+                          margin: const EdgeInsets.all(12),
+                          borderRadius: 10,
+                          duration: const Duration(seconds: 2),
+                        );
+                        return;
+                      }
+                      Get.to(() => Checkout2Screen());
+                    },
                 ),
               ],
             ),
@@ -145,11 +164,9 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 20),
-
             /// Food Image
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.only(left: 18.0,right: 18, ),
               child: Center(
                 child: Container(
                   width: double.infinity,
@@ -157,13 +174,68 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
-                    child: Image.network(widget.food.image),
+                  child: Obx(
+                      ()=> ClipRRect(
+                      borderRadius: BorderRadius.circular(15),
+                      child: Image.network(selectedImage.value),
+                    ),
                   ),
                 ),
               ),
             ),
+
+            /// Extra Food Images (5 images)
+            /// Extra Food Images (max 5)
+            if (widget.food.images != null && widget.food.images!.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 12, left: 12),
+                child: SizedBox(
+                  height: 80,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: widget.food.images!.length > 5
+                        ? 5
+                        : widget.food.images!.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 10),
+                    itemBuilder: (context, index) {
+                      final image = widget.food.images![index];
+
+                      return GestureDetector(
+                        onTap: () {
+                          selectedImage.value = image; // 👈 GetX update
+                        },
+                        child: Obx(
+                              () => ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: selectedImage.value == image
+                                      ? Colors.orange
+                                      : Colors.transparent,
+                                  width: 2,
+                                ),
+                              ),
+                              child: Image.network(
+                                image,
+                                width: 80,
+                                height: 80,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) => Container(
+                                  width: 80,
+                                  height: 80,
+                                  color: Colors.grey.shade200,
+                                  child: const Icon(Icons.image_not_supported),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
 
             /// Title & Description
             Padding(
@@ -276,86 +348,86 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
 
             const SizedBox(height: 20),
             
-            Padding(
-              padding: const EdgeInsets.only(top: 12.0, left: 12, right: 12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      Text('Ratings and Reviews', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),),
-                      Text('(${widget.food.reviewsCount})')
-                    ],
-                  ),
-                  SizedBox(width: 30,),
-
-                  if (widget.food.rating > 0)
-                    Row(
-                      children: [
-                        Text('${widget.food.rating}'),
-                        // 5 Stars
-                        ...List.generate(5, (index) {
-                          double starValue = index + 1.0;
-                          if (widget.food.rating >= starValue) {
-                            return const Icon(
-                              Icons.star,
-                              color: Color(0xFF7F3615),
-                              size: 18,
-                            );
-                          } else if (widget.food.rating >= starValue - 0.5) {
-                            return const Icon(
-                              Icons.star_half,
-                              color: Color(0xFF7F3615),
-                              size: 18,
-                            );
-                          } else {
-                            return const Icon(
-                              Icons.star_border,
-                              color: Color(0xFF7F3615),
-                              size: 18,
-                            );
-                          }
-                        }),
-
-                      ],
-                    )
-                ],
-              ),
-            ),
-
-            //here fetch the review and show in the screen
-            Obx(() {
-              if (ratingController.isLoading.value && ratingController.review.isEmpty) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (ratingController.review.isEmpty) {
-                return const Padding(
-                  padding: EdgeInsets.all(20),
-                  child: Text("No reviews yet. Be the first to review!", style: TextStyle(color: Colors.grey)),
-                );
-              }
-
-              return ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: ratingController.review.length,
-                itemBuilder: (context, index) {
-                  final rev = ratingController.review[index];
-                  DPrint.log(rev.id);
-                  //final userId =  _authStorageService.getUserId();
-                  // Now this condition is properly typed as bool
-                  final bool isOwnReview = currentUserId.value != null && currentUserId.value == rev.user.id;
-
-                  return ReviewCard(
-                  review: rev,
-                  onDelete: isOwnReview
-                  ? () => ratingController.deleteReview(rev.id)
-                  : null,
-                  );
-                },
-              );
-            })
+            // Padding(
+            //   padding: const EdgeInsets.only(top: 12.0, left: 12, right: 12),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //     children: [
+            //       Row(
+            //         children: [
+            //           Text('Ratings and Reviews', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),),
+            //           Text('(${widget.food.reviewsCount})')
+            //         ],
+            //       ),
+            //       SizedBox(width: 30,),
+            //
+            //       if (widget.food.rating > 0)
+            //         Row(
+            //           children: [
+            //             Text('${widget.food.rating}'),
+            //             // 5 Stars
+            //             ...List.generate(5, (index) {
+            //               double starValue = index + 1.0;
+            //               if (widget.food.rating >= starValue) {
+            //                 return const Icon(
+            //                   Icons.star,
+            //                   color: Color(0xFF7F3615),
+            //                   size: 18,
+            //                 );
+            //               } else if (widget.food.rating >= starValue - 0.5) {
+            //                 return const Icon(
+            //                   Icons.star_half,
+            //                   color: Color(0xFF7F3615),
+            //                   size: 18,
+            //                 );
+            //               } else {
+            //                 return const Icon(
+            //                   Icons.star_border,
+            //                   color: Color(0xFF7F3615),
+            //                   size: 18,
+            //                 );
+            //               }
+            //             }),
+            //
+            //           ],
+            //         )
+            //     ],
+            //   ),
+            // ),
+            //
+            // //here fetch the review and show in the screen
+            // Obx(() {
+            //   if (ratingController.isLoading.value && ratingController.review.isEmpty) {
+            //     return const Center(child: CircularProgressIndicator());
+            //   }
+            //
+            //   if (ratingController.review.isEmpty) {
+            //     return const Padding(
+            //       padding: EdgeInsets.all(20),
+            //       child: Text("No reviews yet. Be the first to review!", style: TextStyle(color: Colors.grey)),
+            //     );
+            //   }
+            //
+            //   return ListView.builder(
+            //     shrinkWrap: true,
+            //     physics: const NeverScrollableScrollPhysics(),
+            //     itemCount: ratingController.review.length,
+            //     itemBuilder: (context, index) {
+            //       final rev = ratingController.review[index];
+            //       DPrint.log(rev.id);
+            //       //final userId =  _authStorageService.getUserId();
+            //       // Now this condition is properly typed as bool
+            //       final bool isOwnReview = currentUserId.value != null && currentUserId.value == rev.user.id;
+            //
+            //       return ReviewCard(
+            //       review: rev,
+            //       onDelete: isOwnReview
+            //       ? () => ratingController.deleteReview(rev.id)
+            //       : null,
+            //       );
+            //     },
+            //   );
+            // })
           ],
         ),
       ),

@@ -24,6 +24,8 @@ class _MessagingScreenState extends State<MessagingScreen> {
   final TextEditingController messageController = TextEditingController();
   final ScrollController scrollController = ScrollController();
 
+  final FocusNode _msgFocus = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -70,50 +72,60 @@ class _MessagingScreenState extends State<MessagingScreen> {
           );
         }),
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.only(bottom: 30, left: 16, right: 16, top: 20),
-        decoration: const BoxDecoration(
-          color: Color(0x8FFFFFFF),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: const Color(0x2EFFB972),
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                child: SizedBox(
-                  height: 30,
-                  child: TextField(
-                    controller: messageController,
-                    decoration: const InputDecoration(
-                      hintText: "Type your message...",
-                      hintStyle: TextStyle(color: Colors.grey),
-                      border: InputBorder.none,
-                      isCollapsed: true,
+        bottomNavigationBar: AnimatedPadding(
+          duration: const Duration(milliseconds: 200),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Container(
+            padding: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+              top: 20,
+              bottom: 16,
+            ),
+            decoration: const BoxDecoration(
+              color: Color(0x8FFFFFFF),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(
+                      color: const Color(0x2EFFB972),
+                      borderRadius: BorderRadius.circular(25),
                     ),
-                    style: const TextStyle(color: Colors.black),
+                    child: SizedBox(
+                      height: 30,
+                      child: TextField(
+                        focusNode: _msgFocus,
+                        controller: messageController,
+                        decoration: const InputDecoration(
+                          hintText: "Type your message...",
+                          border: InputBorder.none,
+                          isCollapsed: true,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            const SizedBox(width: 10),
-            InkWell(
-              onTap: sendMessage,
-              child: Container(
-                padding: const EdgeInsets.all(13),
-                decoration: const BoxDecoration(
-                  color: Color(0x2EFFB972),
-                  shape: BoxShape.circle,
+                const SizedBox(width: 10),
+                InkWell(
+                  onTap: sendMessage,
+                  child: Container(
+                    padding: const EdgeInsets.all(13),
+                    decoration: const BoxDecoration(
+                      color: Color(0x2EFFB972),
+                      shape: BoxShape.circle,
+                    ),
+                    child: AppSvg(asset: Images.msg),
+                  ),
                 ),
-                child: AppSvg(asset: Images.msg),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
-      ),
       body: SafeArea(
         child: Column(
           children: [

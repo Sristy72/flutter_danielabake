@@ -33,6 +33,18 @@ class _FoodListScreenState extends State<FoodListScreen> {
   Widget build(BuildContext context) {
     controller.fetchItems(widget.categoryId); // fetch API
 
+    final size = MediaQuery.sizeOf(context);
+    final width = size.width;
+    final height = size.height;
+
+    double font(double v) => v * (width / 390);
+
+    int gridCount = width > 900
+        ? 4
+        : width > 650
+        ? 3
+        : 2;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -57,11 +69,11 @@ class _FoodListScreenState extends State<FoodListScreen> {
           padding: const EdgeInsets.all(12),
           child: GridView.builder(
             itemCount: foods.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.7,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
+            gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: gridCount,
+              mainAxisExtent: 255,
+              crossAxisSpacing: width * 0.035,
+              mainAxisSpacing: height * 0.02,
             ),
             itemBuilder: (context, index) {
               final food = foods[index];
@@ -76,7 +88,8 @@ class _FoodListScreenState extends State<FoodListScreen> {
                       title: food.name,
                       description: food.description,
                       image: food.image,
-                      ingredients: food.ingredients, price: food.price.toString(), id: food.id, rating: food.rating, reviewsCount: food.reviewsCount,
+                      ingredients: food.ingredients, price: food.price.toString(), id: food.id,
+                      //rating: food.rating, reviewsCount: food.reviewsCount,
                     ),
                   ));
                 },

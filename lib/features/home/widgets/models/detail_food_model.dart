@@ -8,18 +8,21 @@ class FoodModel {
   final String title;
   final String description;
   final String image; // network or asset
+  final List<String>? images;
   final String price; // network or asset
   final List<ItemIngredient> ingredients;
-  final double rating;
-  final int reviewsCount;
+  // final double rating;
+  // final int reviewsCount;
 
   FoodModel({
     required this.id,
     required this.title,
     required this.description,
     required this.image,
+    this.images,
     required this.price,
-    required this.ingredients, required this.rating, required this.reviewsCount,
+    required this.ingredients,
+    //required this.rating, required this.reviewsCount,
   });
 }
 

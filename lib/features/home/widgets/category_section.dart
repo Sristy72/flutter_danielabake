@@ -1,3 +1,4 @@
+import 'package:danielabake/features/profile_screens/screens/favorite_items.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/category_controller.dart';
@@ -32,19 +33,27 @@ class CategorySection extends StatelessWidget {
           //padding: const EdgeInsets.symmetric(horizontal: 16),
           separatorBuilder: (_, __) => const SizedBox(width: 12),
           itemBuilder: (context, index) {
-            final cat = categories[index];     //FIXED
-
-            return CategoryCard(
-              title: cat.name,
-              imageUrl: cat.image,
-              bgColor: Color(cat.bgColor),
-              onTap: () {
-                Get.to(() => FoodListScreen(
-                  categoryId: cat.id,
-                  categoryName: cat.name,
-                ));
-              },
-            );
+            final cat = categories[index];
+            if (cat.name.toLowerCase() == "favorite items") {
+              return CategoryCard(
+                title: cat.name,
+                imageUrl: cat.image,
+                bgColor: Color(cat.bgColor),
+                onTap: () => Get.to(() => const FavoriteItems()),
+              );
+            } else {
+              return CategoryCard(
+                title: cat.name,
+                imageUrl: cat.image,
+                bgColor: Color(cat.bgColor),
+                onTap: () {
+                  Get.to(() => FoodListScreen(
+                    categoryId: cat.id,
+                    categoryName: cat.name,
+                  ));
+                },
+              );
+            }//FIXED
           },
         ),
       );

@@ -3,6 +3,7 @@ import 'package:danielabake/features/home/widgets/weekly_menu_card.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controller/weekly_menu_controller.dart';
+import '../controller/home_controller.dart';
 
 class WeeklyMenuSlider extends StatefulWidget {
   const WeeklyMenuSlider({super.key});
@@ -18,35 +19,25 @@ class _WeeklyMenuSliderState extends State<WeeklyMenuSlider> {
   Timer? _timer;
   late int _currentPage;
 
-  /// 👇 THIS FUNCTION decides today's index
   int _getTodayIndex() {
-    // DateTime.weekday: Monday = 1 ... Sunday = 7
-    // Your days list: ['Monday', 'Tuesday', ..., 'Sunday']
-    final todayIndex = DateTime.now().weekday;
-
-
-    // Safety check: if list shorter (e.g., only Mon-Fri)
-    return todayIndex.clamp(0, _controller.days.length);
+    // Monday = 1 ... Sunday = 7
+    final today = DateTime.now().weekday - 1;
+    return today.clamp(0, _controller.days.length - 1);
   }
 
   @override
   void initState() {
     super.initState();
 
-    // Start from today
-    _currentPage = _getTodayIndex();
-    _pageController = PageController();
+    final todayIndex = _getTodayIndex();
 
-    // Jump to today AFTER first frame
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_pageController.hasClients) {
-        _pageController.jumpToPage(_currentPage);
-      }
-    });
 
-    // Auto-slide every 5 seconds
+    _currentPage = 1000 + todayIndex;
+
+    _pageController = PageController(initialPage: _currentPage);
+
     _timer = Timer.periodic(const Duration(seconds: 5), (_) {
-      _currentPage = (_currentPage + 1) % _controller.days.length;
+      _currentPage++;
 
       if (_pageController.hasClients) {
         _pageController.animateToPage(
@@ -58,8 +49,6 @@ class _WeeklyMenuSliderState extends State<WeeklyMenuSlider> {
     });
   }
 
-
-
   @override
   void dispose() {
     _timer?.cancel();
@@ -70,7 +59,7 @@ class _WeeklyMenuSliderState extends State<WeeklyMenuSlider> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 180,
+      height: 200,
       child: Obx(() {
         final weeklyMenu = _controller.weeklyMenuByDay;
 
@@ -79,17 +68,15 @@ class _WeeklyMenuSliderState extends State<WeeklyMenuSlider> {
         }
 
         return PageView.builder(
-          clipBehavior: Clip.none,
           controller: _pageController,
-          itemCount: _controller.days.length,
+          clipBehavior: Clip.none,
+          // ❌ REMOVE itemCount → infinite
           itemBuilder: (_, index) {
-            final day = _controller.days[index];
+            final dayIndex = index % _controller.days.length;
+            final day = _controller.days[dayIndex];
             final items = weeklyMenu[day] ?? [];
 
-            return WeeklyMenuCard(
-              day:day,
-              items: items,
-            );
+            return WeeklyMenuCard(day: day, items: items);
           },
         );
       }),

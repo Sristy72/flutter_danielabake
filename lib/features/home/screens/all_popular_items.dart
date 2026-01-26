@@ -31,7 +31,7 @@ class _AllPopularItemsState extends State<AllPopularItems> {
 
   @override
   void initState() {
-    _homeController.popularItem();
+    _homeController.fetchAllPopularItem();
     super.initState();
   }
 
@@ -40,8 +40,17 @@ class _AllPopularItemsState extends State<AllPopularItems> {
     final double screenH = MediaQuery.of(context).size.height;
     final double screenW = MediaQuery.of(context).size.width;
 
-    // Responsive columns
-    final int crossAxisCount = screenW > 700 ? 4 : screenW > 500 ? 3 : 2;
+    final size = MediaQuery.sizeOf(context);
+    final width = size.width;
+    final height = size.height;
+
+    double font(double v) => v * (width / 390);
+
+    int gridCount = width > 900
+        ? 4
+        : width > 650
+        ? 3
+        : 2;
 
     return AppScaffold(
       appBar: AppBar(
@@ -86,7 +95,7 @@ class _AllPopularItemsState extends State<AllPopularItems> {
           final bool searching = _isSearching.value;
           final items = searching
               ? _homeController.search.value?.items ?? []
-              : _homeController.popularItem.value?.items ?? [];
+              : _homeController.allPopularItem.value?.items ?? [];
 
           if (_homeController.isLoading.value && !searching) {
             return const Center(child: CircularProgressIndicator());
@@ -102,15 +111,16 @@ class _AllPopularItemsState extends State<AllPopularItems> {
           }
 
           return GridView.builder(
-            padding: EdgeInsets.symmetric(
-              vertical: screenH * 0.015,
-            ),
-            physics: const BouncingScrollPhysics(),
+            // padding: EdgeInsets.symmetric(
+            //   vertical: screenH * 0.015,
+            // ),
+            // shrinkWrap: true,
+            // physics: const BouncingScrollPhysics(),
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              mainAxisExtent: screenH * 0.30,
-              crossAxisSpacing: screenW * 0.035,
-              mainAxisSpacing: screenH * 0.02,
+              crossAxisCount: gridCount,
+              mainAxisExtent: 255,
+              crossAxisSpacing: width * 0.025,
+              mainAxisSpacing: width * 0.025,
             ),
             itemCount: items.length,
             itemBuilder: (_, index) {
@@ -126,7 +136,8 @@ class _AllPopularItemsState extends State<AllPopularItems> {
                       image: item.image,
                       ingredients: item.ingredients,
                       price: item.price.toString(),
-                      id: item.id, rating: item.rating, reviewsCount: item.reviewsCount,
+                      id: item.id, images: item.images,
+                      //rating: item.rating, reviewsCount: item.reviewsCount,
                     ),
                   ));
                 },

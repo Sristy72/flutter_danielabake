@@ -15,15 +15,16 @@ class GetPopularItemResponseModel {
 
   factory GetPopularItemResponseModel.fromJson(Map<String, dynamic> json) {
     return GetPopularItemResponseModel(
-      total: json['total'],
-      page: json['page'],
-      pages: json['pages'],
-      items: (json['items'] as List<dynamic>)
+      total: json['total'] ?? 0,
+      page: json['page'] ?? 1,
+      pages: json['pages'] ?? 1,
+      items: (json['items'] as List<dynamic>? ?? [])
           .map((e) => PopularItem.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
 }
+
 
 class PopularItem {
   final String id;
@@ -31,11 +32,12 @@ class PopularItem {
   final String description;
   final double price;
   final String image;
+  final List<String> images;
   final ItemCategory category;
   final List<ItemIngredient> ingredients;
   final double rating;
   final int reviewsCount;
-  final List<String> availableDays;
+  final List<String> specialDays;
   final String createdAt;
   final String updatedAt;
 
@@ -45,38 +47,38 @@ class PopularItem {
     required this.description,
     required this.price,
     required this.image,
+    required this.images,
     required this.category,
     required this.ingredients,
     required this.rating,
     required this.reviewsCount,
-    required this.availableDays,
+    required this.specialDays,
     required this.createdAt,
     required this.updatedAt,
   });
 
   factory PopularItem.fromJson(Map<String, dynamic> json) {
     return PopularItem(
-      id: json['_id'],
-      name: json['name'],
-      description: json['description'],
-      price: (json['price'] as num).toDouble(),
-      image: json['image'],
-      category: ItemCategory.fromJson(json['category']),
-      ingredients: (json['ingredients'] as List<dynamic>)
+      id: json['_id'] ?? '',
+      name: json['name'] ?? '',
+      description: json['description'] ?? '',
+      price: (json['price'] as num?)?.toDouble() ?? 0.0,
+      image: json['image'] ?? '',
+      images: List<String>.from(json['images'] ?? []),
+      category: ItemCategory.fromJson(json['category'] ?? {}),
+      ingredients: (json['ingredients'] as List<dynamic>? ?? [])
           .map((e) => ItemIngredient.fromJson(e))
           .toList(),
-      rating: (json['rating'] as num).toDouble(),
-      reviewsCount: json['reviewsCount'] != null
-          ? (json['reviewsCount'] is num
-          ? json['reviewsCount'] as int
-          : int.parse(json['reviewsCount'].toString()))
-          : 0,
-      availableDays: List<String>.from(json['availableDays']),
-      createdAt: json['createdAt'],
-      updatedAt: json['updatedAt'],
+      rating: (json['rating'] as num?)?.toDouble() ?? 0.0,
+      reviewsCount: (json['reviewsCount'] as num?)?.toInt() ?? 0,
+      specialDays: List<String>.from(json['specialDays'] ?? []), // ✅ FIXED
+      createdAt: json['createdAt'] ?? '',
+      updatedAt: json['updatedAt'] ?? '',
     );
   }
 }
+
+
 
 class ItemCategory {
   final String id;
@@ -91,32 +93,9 @@ class ItemCategory {
 
   factory ItemCategory.fromJson(Map<String, dynamic> json) {
     return ItemCategory(
-      id: json['_id'],
-      name: json['name'],
-      image: json['image'],
+      id: json['_id'] ?? '',
+      name: json['name'] ?? '',
+      image: json['image'] ?? '',
     );
   }
 }
-
-// class ItemIngredient {
-//   final String name;
-//   final bool isAllergen;
-//   final String id;
-//   final String? image;
-//
-//   ItemIngredient({
-//     required this.name,
-//     required this.isAllergen,
-//     required this.id,
-//     this.image,
-//   });
-//
-//   factory ItemIngredient.fromJson(Map<String, dynamic> json) {
-//     return ItemIngredient(
-//       name: json['name'],
-//       isAllergen: json['isAllergen'],
-//       id: json['_id'],
-//       image: json['image'],
-//     );
-//   }
-// }

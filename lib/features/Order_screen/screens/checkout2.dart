@@ -27,7 +27,7 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
   }
 
   Future<void> _submit() async {
-    // if (!_formKey.currentState!.validate()) return;
+     if (!_formKey.currentState!.validate()) return;
     orderController.placeOrder(addressController.text, phoneController.text);
   }
 
@@ -95,12 +95,12 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
 
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            // The main container with address, phone, delivery
-            Padding(
-              padding: const EdgeInsets.only(top: 30.0),
-              child: Container(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              // The main container with address, phone, delivery
+              Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: const Color(0x2EFFB972),
@@ -142,15 +142,15 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
                       imagePath: Images.delivery,
                       title: "Estimated Delivery Time",
                       child: const Text(
-                        "2hr",
+                        "1hr",
                         style: TextStyle(fontSize: 14, color: Colors.grey),
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

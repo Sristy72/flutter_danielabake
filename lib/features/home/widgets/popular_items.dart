@@ -56,7 +56,7 @@ class FoodCard extends StatelessWidget {
                 ),
                 child: Image.network(
                   imagePath,
-                  height: 160,
+                  height: 140,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
@@ -110,22 +110,24 @@ class FoodCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 14,
+                    Expanded(
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 14,
+                        ),
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    Spacer(),
+
                     Obx(
                           () => InkWell(
                         onTap: () async {
                           try {
                             final newValue = !isFavorite.value;
-                            isFavorite.value = newValue; // Optimistic update
+                            isFavorite.value = newValue;
 
                             if (newValue) {
                               await favoriteController.favorite(itemId);
@@ -135,7 +137,7 @@ class FoodCard extends StatelessWidget {
                               onFavoriteToggle?.call(false);
                             }
                           } catch (e) {
-                            isFavorite.value = !isFavorite.value; // Revert on error
+                            isFavorite.value = !isFavorite.value;
                             DPrint.log("Favorite toggle error: $e");
                           }
                         },
@@ -146,7 +148,7 @@ class FoodCard extends StatelessWidget {
                             isFavorite.value
                                 ? Icons.favorite
                                 : Icons.favorite_border,
-                            color: isFavorite.value ? Colors.white : Colors.white,
+                            color: Colors.white,
                             size: 16,
                           ),
                         ),
@@ -165,7 +167,7 @@ class FoodCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 9),
 
                 // Stars + Review Count in ONE Row
                 if (rating != null && rating! > 0)
@@ -195,28 +197,28 @@ class FoodCard extends StatelessWidget {
                         }
                       }),
 
-
                       const SizedBox(width: 8),
-                      // Inside the Row, replace the current Text widget with this:
 
-                        Text(
-                          '(${reviewCount ?? 0})',  // Explicitly convert int to String
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Colors.grey,
-                            fontWeight: FontWeight.w500,
-                          ),
+                      // Inside the Row, replace the current Text widget with this:
+                      Text(
+                        '(${reviewCount ?? 0})',
+                        // Explicitly convert int to String
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500,
                         ),
+                      ),
                     ],
                   ),
               ],
             ),
           ),
 
-          const Spacer(), // Pushes price + button to bottom
+          //const Spacer(), // Pushes price + button to bottom
           // Price + add button
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [

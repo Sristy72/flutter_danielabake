@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../profile_screens/screens/favorite_items.dart';
 import '../controller/category_controller.dart';
 import '../widgets/category_card.dart';
 import '../../../core/common/widgets/app_scaffold.dart';
@@ -10,6 +11,7 @@ class AllCategoryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final controller = Get.find<CategoryController>();
 
     return AppScaffold(
@@ -65,19 +67,26 @@ class AllCategoryScreen extends StatelessWidget {
                   ),
                 itemBuilder: (context, index) {
                   final cat = categories[index];
-
-                  return CategoryCard(
-                    title: cat.name,
-                    imageUrl: cat.image,
-                    bgColor: Color(cat.bgColor),
-                    onTap: () {
-                      Get.to(() => FoodListScreen(
-                        categoryId: cat.id,
-                        categoryName: cat.name,
-                      ));
-                    },
-                  );
-
+                  if (cat.name.toLowerCase() == "favorite items") {
+                    return CategoryCard(
+                      title: cat.name,
+                      imageUrl: cat.image,
+                      bgColor: Color(cat.bgColor),
+                      onTap: () => Get.to(() => const FavoriteItems()),
+                    );
+                  } else {
+                    return CategoryCard(
+                      title: cat.name,
+                      imageUrl: cat.image,
+                      bgColor: Color(cat.bgColor),
+                      onTap: () {
+                        Get.to(() => FoodListScreen(
+                          categoryId: cat.id,
+                          categoryName: cat.name,
+                        ));
+                      },
+                    );
+                  }//FIXED
                 },
               ),
             ),

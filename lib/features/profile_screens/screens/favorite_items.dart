@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import '../../../core/common/shimmer/shimmer_loader.dart';
 import '../../../core/common/shimmer/shimmer_placeholders.dart';
 import '../../../core/common/widgets/app_scaffold.dart';
-import '../../home/widgets/popular_items.dart';
+import '../widgets/favorite_food_cart.dart';
 
 class FavoriteItems extends StatefulWidget {
   const FavoriteItems({super.key});
@@ -121,8 +121,8 @@ class _FavoriteItemsState extends State<FavoriteItems> {
                   padding: const EdgeInsets.all(16),
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: gridCount,
-                    mainAxisExtent: height * 0.3,
-                    crossAxisSpacing: width * 0.035,
+                    //mainAxisExtent: height * 0.4,
+                    crossAxisSpacing: width * 0.015,
                     mainAxisSpacing: height * 0.02,
                   ),
                   itemCount: 6, // Show 6 shimmer cards as placeholder
@@ -150,20 +150,20 @@ class _FavoriteItemsState extends State<FavoriteItems> {
                 itemCount: items.length,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: gridCount,
-                  mainAxisExtent: height * 0.3,
-                  crossAxisSpacing: width * 0.035,
-                  mainAxisSpacing: height * 0.02,
+                  mainAxisExtent: 255,
+                  crossAxisSpacing: width * 0.025,
+                  mainAxisSpacing: width * 0.025,
                 ),
                 itemBuilder: (_, index) {
                   final food = items[index].item;
 
-                  return FoodCard(
+                  return FavoriteFoodCard(
                     imagePath: food!.image,
                     title: food.name,
                     price: food.price.toString(),
                     itemId: food.id,
                     isFavorite: true.obs,
-                    description: '',
+                    description: food.description,
                     onAdd: () => print('Add ${food.name}'),
                     onFavoriteToggle: (val) async {
                       if (!val) {
