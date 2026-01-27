@@ -22,6 +22,119 @@ class _FavoriteItemsState extends State<FavoriteItems> {
     _favoriteFoodController.fetchFavoriteItem(); // Already called in onInit, but safe to call again
   }
 
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final width = size.width;
+    final height = size.height;
+
+    double font(double v) => v * (width / 390);
+
+    int gridCount = width > 900
+        ? 4
+        : width > 650
+        ? 3
+        : 2;
+
+    return AppScaffold(
+      appBar: AppBar(
+        elevation: 0,
+        centerTitle: true,
+        title: Text(
+          'Favorite Items',
+          style: TextStyle(
+            fontSize: font(17),
+            fontWeight: FontWeight.w700,
+            color: Colors.black,
+          ),
+        ),
+      ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+
+        children: [
+          Padding(
+            padding: EdgeInsets.only(bottom: width * 0.04, top: height * 0.02, left: 16),
+            child: Text(
+              'Your All Favorite Items',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: font(15),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+
+          Expanded(
+            child: Obx(() {
+              final isLoading = _favoriteFoodController.isLoading.value;
+              final items = _favoriteFoodController.favoriteItems;
+
+              // Show shimmer when loading
+              if (isLoading) {
+                return GridView.builder(
+                  padding: const EdgeInsets.all(16),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: gridCount,
+                    //mainAxisExtent: height * 0.4,
+                    crossAxisSpacing: width * 0.015,
+                    mainAxisSpacing: height * 0.02,
+                  ),
+                  itemCount: 6, // Show 6 shimmer cards as placeholder
+                  itemBuilder: (context, index) => _buildShimmerCard(),
+                );
+              }
+
+              // Show empty state
+              if (items.isEmpty) {
+                return Center(
+                  child: Text(
+                    'No favorite items found.',
+                    style: TextStyle(
+                      fontSize: font(13),
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey,
+                    ),
+                  ),
+                );
+              }
+
+              // Show real data
+              return GridView.builder(
+                //padding: const EdgeInsets.all(16),
+                itemCount: items.length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: gridCount,
+                  mainAxisExtent: 255,
+                  crossAxisSpacing: width * 0.025,
+                  mainAxisSpacing: width * 0.025,
+                ),
+                itemBuilder: (_, index) {
+                  final food = items[index].item;
+
+                  return FavoriteFoodCard(
+                    imagePath: food!.image,
+                    title: food.name,
+                    price: food.price.toString(),
+                    itemId: food.id,
+                    isFavorite: true.obs,
+                    description: food.description,
+                    onAdd: () => print('Add ${food.name}'),
+                    onFavoriteToggle: (val) async {
+                      if (!val) {
+                        await _favoriteFoodController.removeFavorite(food.id);
+                      }
+                    },
+                  );
+                },
+              );
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
   // Build a single shimmer card (same size as real FoodCard)
   Widget _buildShimmerCard() {
     return Container(
@@ -132,119 +245,6 @@ class _FavoriteItemsState extends State<FavoriteItems> {
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.sizeOf(context);
-    final width = size.width;
-    final height = size.height;
-
-    double font(double v) => v * (width / 390);
-
-    int gridCount = width > 900
-        ? 4
-        : width > 650
-        ? 3
-        : 2;
-
-    return AppScaffold(
-      appBar: AppBar(
-        elevation: 0,
-        centerTitle: true,
-        title: Text(
-          'Favorite Items',
-          style: TextStyle(
-            fontSize: font(17),
-            fontWeight: FontWeight.w700,
-            color: Colors.black,
-          ),
-        ),
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-
-        children: [
-          Padding(
-            padding: EdgeInsets.only(bottom: width * 0.04, top: height * 0.02, left: 16),
-            child: Text(
-              'Your All Favorite Items',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: font(15),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-
-          Expanded(
-            child: Obx(() {
-              final isLoading = _favoriteFoodController.isLoading.value;
-              final items = _favoriteFoodController.favoriteItems;
-
-              // Show shimmer when loading
-              if (isLoading) {
-                return GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: gridCount,
-                    //mainAxisExtent: height * 0.4,
-                    crossAxisSpacing: width * 0.015,
-                    mainAxisSpacing: height * 0.02,
-                  ),
-                  itemCount: 6, // Show 6 shimmer cards as placeholder
-                  itemBuilder: (context, index) => _buildShimmerCard(),
-                );
-              }
-
-              // Show empty state
-              if (items.isEmpty) {
-                return Center(
-                  child: Text(
-                    'No favorite items found.',
-                    style: TextStyle(
-                      fontSize: font(13),
-                      fontWeight: FontWeight.w500,
-                      color: Colors.grey,
-                    ),
-                  ),
-                );
-              }
-
-              // Show real data
-              return GridView.builder(
-                //padding: const EdgeInsets.all(16),
-                itemCount: items.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: gridCount,
-                  mainAxisExtent: 255,
-                  crossAxisSpacing: width * 0.025,
-                  mainAxisSpacing: width * 0.025,
-                ),
-                itemBuilder: (_, index) {
-                  final food = items[index].item;
-
-                  return FavoriteFoodCard(
-                    imagePath: food!.image,
-                    title: food.name,
-                    price: food.price.toString(),
-                    itemId: food.id,
-                    isFavorite: true.obs,
-                    description: food.description,
-                    onAdd: () => print('Add ${food.name}'),
-                    onFavoriteToggle: (val) async {
-                      if (!val) {
-                        await _favoriteFoodController.removeFavorite(food.id);
-                      }
-                    },
-                  );
-                },
-              );
-            }),
           ),
         ],
       ),

@@ -1,10 +1,11 @@
 import 'package:danielabake/features/Order_screen/controller/order_controller.dart';
+import 'package:danielabake/features/profile_screens/controller/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutx_core/core/validation/validators.dart';
 import 'package:get/get.dart';
 import '../../../core/common/widgets/app_scaffold.dart';
 import '../../../core/common/widgets/button_widgets.dart';
-import '../../../core/constants/assets_const.dart';
+import '../../../core/constants/assets_const.dart' hide Icons;
 import '../../../core/utils/app_svg.dart';
 
 class Checkout2Screen extends StatefulWidget {
@@ -21,13 +22,18 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
   final TextEditingController dateController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
   final orderController = Get.find<OrderController>();
+  final profileController = Get.find<ProfileController>();
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
+  String selectedPickupOption = "No";
 
   @override
   void initState() {
     super.initState();
     orderController.fetchCart();
+    if (profileController.userInfo.value != null) {
+      phoneController.text = profileController.userInfo.value!.phone;
+    }
   }
 
   Future<void> _submit() async {
@@ -89,7 +95,7 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: null,
-      helpText: "You can't order for tomorrow after 11:00 AM",
+      helpText: "Passed cut off time for tomorrow after 11:00 AM",
       firstDate: firstSelectableDate,
       lastDate: now.add(const Duration(days: 30)),
       selectableDayPredicate: (DateTime day) {
@@ -229,12 +235,12 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
                   children: [
                     _buildTile(
                       imagePath: Images.address,
-                      title: "Home",
+                      title: "Delivery Location",
                       child: TextFormField(
                         controller: addressController,
-                        validator: Validators.name,
+                        validator: Validators.addressAndCity,
                         decoration: const InputDecoration(
-                          hintText: "Enter address",
+                          hintText: "Enter address and city",
                           hintStyle: TextStyle(color: Colors.grey),
                           border: InputBorder.none,
                         ),
@@ -256,6 +262,7 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
                         ),
                       ),
                     ),
+
 
                     _divider(),
                     _buildTile(
@@ -282,7 +289,7 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
                     _divider(),
                     _buildTile(
                       imagePath: Images.delivery,
-                      title: "Delivery Time",
+                      title: "Estimated delivery time",
                       child: TextFormField(
                         controller: timeController,
                         keyboardType: TextInputType.text,
@@ -318,10 +325,44 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
                           return null;
                         },
                         decoration: const InputDecoration(
-                          hintText: "e.g. 30 mins or 1 hr",
+                          hintText: "Minimum 30 minutes window",
                           hintStyle: TextStyle(color: Colors.grey),
                           border: InputBorder.none,
                         ),
+                      ),
+                    ),
+
+                    _divider(),
+                    _buildTile(
+                      imagePath: Images.address,
+                      title: "Picking up order",
+                      child: DropdownButtonFormField<String>(
+
+                        value: selectedPickupOption,
+                        items: ["Yes", "No"].map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                color: Colors.black,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (newValue) {
+                          setState(() {
+                            selectedPickupOption = newValue!;
+                          });
+                        },
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                          isDense: true,
+                        ),
+                        icon: Icon(Icons.keyboard_arrow_down, size: 20),
+                        dropdownColor: const Color(0xFFFFF3E0),
                       ),
                     ),
                   ],

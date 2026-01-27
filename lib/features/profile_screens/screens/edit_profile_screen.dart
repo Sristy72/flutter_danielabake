@@ -18,8 +18,7 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final TextEditingController _nameTEController = TextEditingController();
-  final TextEditingController _phonenumberTEController =
-  TextEditingController();
+  final TextEditingController _phonenumberTEController = TextEditingController();
 
   final ProfileController _profileController = Get.find<ProfileController>();
 
@@ -87,24 +86,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               SizedBox(height: 20,),
               // ─── Profile picture + edit ───
               Center(
-                child: Stack(
-                  children: [
-                    AppCachedImage(
-                      width: 130,
-                      height: 130,
-                      fit: BoxFit.cover,
-                      borderRadius: BorderRadius.circular(60),
-                      icon: Icons.person,
-                      iconColor: Colors.black,
-                      imageFile: _selectedImage,
-                      imageUrl: imageUrl,
-                      onTap:  _pickImage, // show picked image
-                    ),
-                    Positioned(
-                      right: 0,
-                      bottom: 0,
-                      child: GestureDetector(
-                        onTap: _pickImage,
+                child: GestureDetector(
+                  onTap: _pickImage,
+                  child: Stack(
+                    children: [
+                      AppCachedImage(
+                        width: 130,
+                        height: 130,
+                        fit: BoxFit.cover,
+                        borderRadius: BorderRadius.circular(60),
+                        icon: Icons.person,
+                        iconColor: Colors.black,
+                        imageFile: _selectedImage,
+                        imageUrl: imageUrl,
+                        onTap:  _pickImage, // show picked image
+                      ),
+                      Positioned(
+                        right: 0,
+                        bottom: 0,
                         child: Container(
                           padding: const EdgeInsets.all(9),
                           decoration: const BoxDecoration(
@@ -122,8 +121,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
