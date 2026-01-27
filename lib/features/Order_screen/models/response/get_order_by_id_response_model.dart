@@ -41,6 +41,7 @@ class Order {
   final String phone;
   final String status;
   final String paymentStatus;
+  final DateTime scheduledFor;
   final String estimatedDelivery;
   final String createdAt;
   final String updatedAt;
@@ -54,6 +55,7 @@ class Order {
     required this.phone,
     required this.status,
     required this.paymentStatus,
+    required this.scheduledFor,
     required this.estimatedDelivery,
     required this.createdAt,
     required this.updatedAt,
@@ -71,6 +73,7 @@ class Order {
       phone: json['phone'],
       status: json['status'],
       paymentStatus: json['paymentStatus'],
+      scheduledFor: DateTime.parse(json['scheduledFor']),
       estimatedDelivery: json['estimatedDelivery'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],

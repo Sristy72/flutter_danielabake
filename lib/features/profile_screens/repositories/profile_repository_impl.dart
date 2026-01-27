@@ -32,21 +32,21 @@ NetworkResult<List<GetFavoriteItemsResponseModel>> fetchFavoriteItems(String use
         fromJsonT: (json) => (json as List).map((item) => GetFavoriteItemsResponseModel.fromJson(item)).toList());
   }
 
-  @override
-  NetworkResult<OngoingOrderResponseModel> fetchOngoingOrder() {
-    return _apiClient.get(
-      endpoint: ApiConstants.profile.fetchOngoing,
-      fromJsonT: (json) => OngoingOrderResponseModel.fromJson(json as Map<String, dynamic>),
-    );
-  }
-
-  @override
-  NetworkResult<OngoingOrderResponseModel> fetchCompletedOrder(){
-    return _apiClient.get(
-      endpoint: ApiConstants.profile.fetchDelivered,
-      fromJsonT: (json) => OngoingOrderResponseModel.fromJson(json as Map<String, dynamic>),
-    );
-  }
+  // @override
+  // NetworkResult<OngoingOrderResponseModel> fetchOngoingOrder() {
+  //   return _apiClient.get(
+  //     endpoint: ApiConstants.profile.fetchOngoing,
+  //     fromJsonT: (json) => OngoingOrderResponseModel.fromJson(json as Map<String, dynamic>),
+  //   );
+  // }
+  //
+  // @override
+  // NetworkResult<OngoingOrderResponseModel> fetchCompletedOrder(){
+  //   return _apiClient.get(
+  //     endpoint: ApiConstants.profile.fetchDelivered,
+  //     fromJsonT: (json) => OngoingOrderResponseModel.fromJson(json as Map<String, dynamic>),
+  //   );
+  // }
 
 
 

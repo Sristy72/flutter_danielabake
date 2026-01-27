@@ -3,8 +3,6 @@ import 'package:danielabake/features/Order_screen/models/response/get_order_by_i
 import '../../../core/network/network_result.dart';
 
 
-
-
 abstract class CartRepo{
   NetworkResult<GetCartResponseModel> fetchCart(String userId);
   NetworkResult<GetOrderByIdResponseModel> fetchOngoingOrder();

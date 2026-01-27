@@ -15,8 +15,8 @@ class ProfileController extends BaseController {
   final AuthStorageService _authStorageService = AuthStorageService();
 
   final Rxn<GetProfileResponseModel> userInfo = Rxn<GetProfileResponseModel>();
-  final Rxn<OngoingOrderResponseModel> ongoingOrder = Rxn<OngoingOrderResponseModel>();
-  final Rxn<OngoingOrderResponseModel> completedOrder = Rxn<OngoingOrderResponseModel>();
+  // final Rxn<OngoingOrderResponseModel> ongoingOrder = Rxn<OngoingOrderResponseModel>();
+  // final Rxn<OngoingOrderResponseModel> completedOrder = Rxn<OngoingOrderResponseModel>();
   final MultiFormDataManager _multiFormDataManager = MultiFormDataManager();
   final favoriteItems = <GetFavoriteItemsResponseModel>[].obs;
 
@@ -24,8 +24,6 @@ class ProfileController extends BaseController {
   void onInit() {
     super.onInit();
     fetchProfile(); //Fetch when controller is created
-    fetchOngoingOrders();
-    fetchFavoriteItem();
   }
 
   Future<void> fetchProfile() async {
@@ -139,37 +137,37 @@ class ProfileController extends BaseController {
     );
   }
 
-  Future<void> fetchOngoingOrders() async {
+  // Future<void> fetchOngoingOrders() async {
+  //
+  //   final result = await _profileRepository.fetchOngoingOrder();
+  //
+  //   result.fold(
+  //         (fail) {
+  //       setError(fail.message);
+  //       DPrint.log('data fetch failed');
+  //     },
+  //         (success) {
+  //       ongoingOrder.value = success.data;
+  //       DPrint.log(success.message);
+  //     },
+  //   );
+  // }
 
-    final result = await _profileRepository.fetchOngoingOrder();
-
-    result.fold(
-          (fail) {
-        setError(fail.message);
-        DPrint.log('data fetch failed');
-      },
-          (success) {
-        ongoingOrder.value = success.data;
-        DPrint.log(success.message);
-      },
-    );
-  }
-
-  Future<void> fetchCompletedOrders() async {
-
-    final result = await _profileRepository.fetchCompletedOrder();
-
-    result.fold(
-          (fail) {
-        setError(fail.message);
-        DPrint.log('data fetch failed');
-      },
-          (success) {
-        completedOrder.value = success.data;
-        DPrint.log(success.message);
-      },
-    );
-  }
+  // Future<void> fetchCompletedOrders() async {
+  //
+  //   final result = await _profileRepository.fetchCompletedOrder();
+  //
+  //   result.fold(
+  //         (fail) {
+  //       setError(fail.message);
+  //       DPrint.log('data fetch failed');
+  //     },
+  //         (success) {
+  //       completedOrder.value = success.data;
+  //       DPrint.log(success.message);
+  //     },
+  //   );
+  // }
 
   Future<void> fetchFavoriteItem() async {
     final userId = await _authStorageService.getUserId();

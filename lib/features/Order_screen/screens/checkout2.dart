@@ -337,7 +337,6 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
                       imagePath: Images.address,
                       title: "Picking up order",
                       child: DropdownButtonFormField<String>(
-
                         value: selectedPickupOption,
                         items: ["Yes", "No"].map((String value) {
                           return DropdownMenuItem<String>(
@@ -362,7 +361,7 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
                           isDense: true,
                         ),
                         icon: Icon(Icons.keyboard_arrow_down, size: 20),
-                        dropdownColor: const Color(0xFFFFF3E0),
+                        dropdownColor: const Color(0xFFFFF9F2),
                       ),
                     ),
                   ],

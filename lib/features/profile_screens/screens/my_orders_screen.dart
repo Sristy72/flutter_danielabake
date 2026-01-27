@@ -5,6 +5,7 @@ import 'package:danielabake/features/review_rating/controllers/rating_controller
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/common/widgets/button_widgets.dart';
 import '../widgets/text_formatter.dart';
@@ -254,6 +255,24 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
                 "Total: \$${order.totalAmount.toStringAsFixed(2)}",
                 style: const TextStyle(
                   fontWeight: FontWeight.w600,
+                  fontSize: 17,
+                ),
+              ),
+            ],
+          ),
+
+          if(!isCompleted)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Delivery Date:",
+                style: const TextStyle(color: Colors.grey),
+              ),
+              Text(
+                DateFormat('dd MMM yyyy, hh:mm a').format(order.scheduledFor),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w500,
                   fontSize: 17,
                 ),
               ),
