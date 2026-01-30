@@ -123,18 +123,28 @@ class FoodCard extends StatelessWidget {
                     ),
 
                     Obx(
-                          () => InkWell(
+                      () => InkWell(
                         onTap: () async {
                           try {
                             final newValue = !isFavorite.value;
                             isFavorite.value = newValue;
 
+                            bool success = false;
                             if (newValue) {
-                              await favoriteController.favorite(itemId);
-                              onFavoriteToggle?.call(true);
+                              success = await favoriteController.favorite(
+                                itemId,
+                              );
+                              if (success) onFavoriteToggle?.call(true);
                             } else {
-                              await favoriteController.removeFavorite(itemId);
-                              onFavoriteToggle?.call(false);
+                              success = await favoriteController.removeFavorite(
+                                itemId,
+                              );
+                              if (success) onFavoriteToggle?.call(false);
+                            }
+
+                            if (!success) {
+                              isFavorite.value =
+                                  !newValue; // Revert if failed or guest
                             }
                           } catch (e) {
                             isFavorite.value = !isFavorite.value;

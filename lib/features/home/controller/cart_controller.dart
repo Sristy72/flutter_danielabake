@@ -1,12 +1,13 @@
 // import 'dart:developer' as DPrint;
-// import 'package:danielabake/features/home/models/request/remove_cart_request_model.dart';
 // import 'package:danielabake/features/home/repositories/cart_repository.dart';
 // import 'package:flutter/material.dart';
 // import 'package:get/get.dart';
 // import '../../../../core/base/base_controller.dart';
 // import '../../../core/network/services/auth_storage_service.dart';
-// import '../../Order_screen/models/response/get_cart_response_model.dart';
-// import '../models/request/cart_request_model.dart';
+import 'package:danielabake/features/auth/screens/login_screen.dart';
+import '../../Order_screen/models/response/get_cart_response_model.dart';
+import '../models/request/cart_request_model.dart';
+
 //
 // class AddToCartController extends BaseController {
 //   final _addCartRepo = Get.find<CartRepository>();
@@ -18,8 +19,25 @@
 //     final userId = await _authStorageService.getUserId();
 //     DPrint.log('UserId: $userId');
 //     if (userId == null || userId.isEmpty) {
-//       setError('User ID not found. Please log in again.');
-//       Get.snackbar('Error', 'User ID not found. Please log in again.');
+//       if (Get.isDialogOpen == true) return; // Prevent double dialogs
+//       Get.defaultDialog(
+//         title: "Guest User",
+//         middleText: "Please sign in to add items to cart.",
+//         actions: [
+//           TextButton(
+//             onPressed: () => Get.back(),
+//             child: const Text("Cancel"),
+//           ),
+//           ElevatedButton(
+//             onPressed: () {
+//               Get.back(); // Close dialog
+//               Get.to(() => const LoginScreen());
+//             },
+//             style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+//             child: const Text("Sign In", style: TextStyle(color: Colors.white)),
+//           ),
+//         ],
+//       );
 //       setLoading(false);
 //       return;
 //     }

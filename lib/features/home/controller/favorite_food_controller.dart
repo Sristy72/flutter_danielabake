@@ -8,14 +8,14 @@ import 'package:get/get.dart';
 import '../../../../core/base/base_controller.dart';
 import '../../../core/network/services/auth_storage_service.dart';
 import '../../profile_screens/repositories/profile_repository.dart';
+import 'package:danielabake/features/auth/screens/login_screen.dart';
 
 class FavoriteFoodController extends BaseController {
   final _profileRepository = Get.find<ProfileRepository>();
   final _favoriteRepository = Get.find<FavoriteFoodRepository>();
   final AuthStorageService _authStorageService = AuthStorageService();
-  final RxList<GetFavoriteItemsResponseModel> favoriteItems = <GetFavoriteItemsResponseModel>[].obs;
-
-
+  final RxList<GetFavoriteItemsResponseModel> favoriteItems =
+      <GetFavoriteItemsResponseModel>[].obs;
 
   @override
   void onInit() {
@@ -23,74 +23,87 @@ class FavoriteFoodController extends BaseController {
     fetchFavoriteItem();
   }
 
-
-  Future<void> favorite(String itemId) async {
+  Future<bool> favorite(String itemId) async {
     final userId = await _authStorageService.getUserId();
     DPrint.log('UserId: $userId');
     if (userId == null || userId.isEmpty) {
-      setError('User ID not found. Please log in again.');
-      Get.snackbar('Error', 'User ID not found. Please log in again.');
+      if (Get.isDialogOpen == true)
+        return false; // Prevent double dialogs, return false
+      Get.defaultDialog(
+        title: "Guest User",
+        middleText: "Please sign in to add favorites.",
+        actions: [
+          TextButton(onPressed: () => Get.back(), child: const Text("Cancel")),
+          ElevatedButton(
+            onPressed: () {
+              Get.back(); // Close dialog
+              Get.to(() => const LoginScreen());
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+            child: const Text("Sign In", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      );
       setLoading(false);
-      return;
+      return false; // Return false for guest
     }
     final request = FavoriteFoodRequestModel(userId: userId, itemId: itemId);
     final result = await _favoriteRepository.favorite(request, userId, itemId);
 
-
-    result.fold(
-          (fail) {
+    return result.fold(
+      (fail) {
         setError(fail.message);
         DPrint.log("Favorite success result : ${fail.message}");
         setLoading(false);
+        return false; // Return false on failure
       },
-          (success) {
+      (success) {
         DPrint.log("Favorite success result : ${success.data.id}");
-        // Get.snackbar(
-        //   "Success",
-        //   "Item added to your favorites",
-        //   snackPosition: SnackPosition.BOTTOM,
-        // );
+        return true; // Return true on success
       },
     );
   }
 
-
   Future<void> fetchFavoriteItem() async {
     final userId = await _authStorageService.getUserId();
     if (userId == null || userId.isEmpty) {
-      Get.snackbar('Error', 'Please log in again.');
+      // Guest user: just return empty list, no error
       return;
     }
 
     setLoading(true);
     final result = await _profileRepository.fetchFavoriteItems(userId);
 
-    result.fold(
-          (fail) => setError(fail.message),
-          (success) {
-        // ✅ FILTER NULL ITEMS HERE
-        final cleanList = success.data
-            .where((e) => e.item != null)
-            .toList();
+    result.fold((fail) => setError(fail.message), (success) {
+      // ✅ FILTER NULL ITEMS HERE
+      final cleanList = success.data.where((e) => e.item != null).toList();
 
-        favoriteItems.assignAll(cleanList);
-      },
-    );
+      favoriteItems.assignAll(cleanList);
+    });
 
     setLoading(false);
   }
 
-
-  Future<void> removeFavorite(String itemId) async {
+  Future<bool> removeFavorite(String itemId) async {
     final userId = await _authStorageService.getUserId();
-    if (userId == null || userId.isEmpty) return;
+    if (userId == null || userId.isEmpty) return false;
 
-    final request = RemoveFavoriteFoodRequestModel(userId: userId, itemId: itemId);
-    final result = await _favoriteRepository.removeFavorite(request, userId, itemId);
+    final request = RemoveFavoriteFoodRequestModel(
+      userId: userId,
+      itemId: itemId,
+    );
+    final result = await _favoriteRepository.removeFavorite(
+      request,
+      userId,
+      itemId,
+    );
 
-    result.fold(
-          (fail) => Get.snackbar('Error', fail.message),
-          (success) {
+    return result.fold(
+      (fail) {
+        Get.snackbar('Error', fail.message);
+        return false;
+      },
+      (success) {
         // INSTANT UI UPDATE — Remove from observable list
         favoriteItems.removeWhere((entry) => entry.item?.id == itemId);
         favoriteItems.refresh();
@@ -102,6 +115,7 @@ class FavoriteFoodController extends BaseController {
           colorText: Colors.white,
           snackPosition: SnackPosition.BOTTOM,
         );
+        return true;
       },
     );
   }

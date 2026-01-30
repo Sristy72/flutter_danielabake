@@ -19,6 +19,7 @@ class ProfileController extends BaseController {
   // final Rxn<OngoingOrderResponseModel> completedOrder = Rxn<OngoingOrderResponseModel>();
   final MultiFormDataManager _multiFormDataManager = MultiFormDataManager();
   final favoriteItems = <GetFavoriteItemsResponseModel>[].obs;
+  final RxBool isGuest = false.obs;
 
   @override
   void onInit() {
@@ -30,10 +31,11 @@ class ProfileController extends BaseController {
     final userId = await _authStorageService.getUserId();
     DPrint.log('UserId: $userId');
     if (userId == null || userId.isEmpty) {
-      setError('User ID not found. Please log in again.');
-      Get.snackbar('Error', 'User ID not found. Please log in again.');
+      isGuest.value = true;
       setLoading(false);
       return;
+    } else {
+      isGuest.value = false;
     }
 
     final result = await _profileRepository.fetchProfile(userId);
@@ -52,9 +54,9 @@ class ProfileController extends BaseController {
 
   Future<void> updatePersonalInfo(
     String fullName,
-    String phoneNumber, File? image
+    String phoneNumber,
+    File? image,
   ) async {
-
     final userId = await _authStorageService.getUserId();
     DPrint.log('UserId: $userId');
 
@@ -73,10 +75,12 @@ class ProfileController extends BaseController {
       _multiFormDataManager.addImageFile(image, key: "avatar");
     }
 
-
     final formRequest = await _multiFormDataManager.toFormDataAsync();
 
-    final result = await _profileRepository.updatePersonalInfo(formRequest, userId);
+    final result = await _profileRepository.updatePersonalInfo(
+      formRequest,
+      userId,
+    );
 
     result.fold(
       (fail) {
@@ -95,17 +99,20 @@ class ProfileController extends BaseController {
 
   //
   //
-  Future<void> changePassword(String oldPassword, String newPassword) async{
-    final request = UpdatePasswordRequestModel(newPassword: newPassword, currentPassword: oldPassword);
+  Future<void> changePassword(String oldPassword, String newPassword) async {
+    final request = UpdatePasswordRequestModel(
+      newPassword: newPassword,
+      currentPassword: oldPassword,
+    );
     final result = await _profileRepository.changePass(request);
 
     result.fold(
-          (fail) {
+      (fail) {
         setError(fail.message);
         DPrint.log("change pass success result : ${fail.message}");
         setLoading(false);
       },
-          (success) {
+      (success) {
         DPrint.log("change pass success result : ${success.message}");
         Get.back();
         setLoading(false);
@@ -126,11 +133,11 @@ class ProfileController extends BaseController {
     final result = await _profileRepository.fetchProfile(userId);
 
     result.fold(
-          (fail) {
+      (fail) {
         setError(fail.message);
         DPrint.log('data fetch failed');
       },
-          (success) {
+      (success) {
         userInfo.value = success.data;
         DPrint.log(success.message);
       },
@@ -182,11 +189,11 @@ class ProfileController extends BaseController {
     final result = await _profileRepository.fetchFavoriteItems(userId);
 
     result.fold(
-          (fail) {
+      (fail) {
         setError(fail.message);
         DPrint.log('data fetch failed');
       },
-          (success) {
+      (success) {
         favoriteItems.value = success.data;
         favoriteItems.refresh();
         DPrint.log(success.message);
