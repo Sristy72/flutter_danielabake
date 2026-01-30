@@ -34,6 +34,7 @@ class PlaceOrderResponseModel {
   final String address;
   final String phone;
   final String status;
+  final bool pickOrder;
   final String paymentStatus;
   final DateTime? scheduledFor;
   final String estimatedDelivery;
@@ -49,6 +50,7 @@ class PlaceOrderResponseModel {
     required this.address,
     required this.phone,
     required this.status,
+    required this.pickOrder,
     required this.paymentStatus,
     required this.scheduledFor,
     required this.estimatedDelivery,
@@ -70,6 +72,7 @@ class PlaceOrderResponseModel {
       phone: json['phone'] ?? '',
       status: json['status'] ?? '',
       paymentStatus: json['paymentStatus'] ?? '',
+      pickOrder: json['pickOrder'] ?? false,
       scheduledFor: json['scheduledFor'] != null
           ? DateTime.parse(json['scheduledFor'])
           : null,

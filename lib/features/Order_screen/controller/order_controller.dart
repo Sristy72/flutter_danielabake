@@ -240,6 +240,8 @@ class OrderController extends BaseController {
     String address,
     String phone,
     DateTime scheduledFor,
+    DateTime scheduledTo,
+    bool pickOrder,
   ) async {
     final userId = await _authStorageService.getUserId();
     DPrint.log('UserId: $userId');
@@ -254,6 +256,8 @@ class OrderController extends BaseController {
       address: address,
       phone: phone,
       scheduledFor: scheduledFor,
+      scheduledTo: scheduledTo,
+      pickOrder: pickOrder,
     );
 
     final result = await _placeOrderRepo.placeOrder(request, userId);

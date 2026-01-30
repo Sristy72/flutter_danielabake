@@ -16,9 +16,7 @@ class GetOrderByIdResponseModel {
       total: json['total'],
       page: json['page'],
       pages: json['pages'],
-      orders: (json['orders'] as List)
-          .map((e) => Order.fromJson(e))
-          .toList(),
+      orders: (json['orders'] as List).map((e) => Order.fromJson(e)).toList(),
     );
   }
 
@@ -42,6 +40,7 @@ class Order {
   final String status;
   final String paymentStatus;
   final DateTime scheduledFor;
+  final DateTime? scheduledTo;
   final String estimatedDelivery;
   final String createdAt;
   final String updatedAt;
@@ -56,6 +55,7 @@ class Order {
     required this.status,
     required this.paymentStatus,
     required this.scheduledFor,
+    this.scheduledTo,
     required this.estimatedDelivery,
     required this.createdAt,
     required this.updatedAt,
@@ -65,15 +65,16 @@ class Order {
     return Order(
       id: json['_id'],
       user: json['user'],
-      items: (json['items'] as List)
-          .map((e) => OrderItem.fromJson(e))
-          .toList(),
+      items: (json['items'] as List).map((e) => OrderItem.fromJson(e)).toList(),
       totalAmount: (json['totalAmount'] as num).toDouble(),
       address: json['address'],
       phone: json['phone'],
       status: json['status'],
       paymentStatus: json['paymentStatus'],
       scheduledFor: DateTime.parse(json['scheduledFor']),
+      scheduledTo: json['scheduledTo'] != null
+          ? DateTime.parse(json['scheduledTo'])
+          : null,
       estimatedDelivery: json['estimatedDelivery'],
       createdAt: json['createdAt'],
       updatedAt: json['updatedAt'],
@@ -90,6 +91,7 @@ class Order {
       'phone': phone,
       'status': status,
       'paymentStatus': paymentStatus,
+      'scheduledTo': scheduledTo?.toIso8601String(),
       'estimatedDelivery': estimatedDelivery,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
@@ -102,11 +104,7 @@ class OrderItem {
   final int quantity;
   final String id;
 
-  OrderItem({
-    required this.item,
-    required this.quantity,
-    required this.id,
-  });
+  OrderItem({required this.item, required this.quantity, required this.id});
 
   factory OrderItem.fromJson(Map<String, dynamic> json) {
     return OrderItem(
@@ -117,11 +115,7 @@ class OrderItem {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'item': item.toJson(),
-      'quantity': quantity,
-      '_id': id,
-    };
+    return {'item': item.toJson(), 'quantity': quantity, '_id': id};
   }
 }
 

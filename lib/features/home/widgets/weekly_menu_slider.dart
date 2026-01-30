@@ -6,6 +6,7 @@ import '../controller/weekly_menu_controller.dart';
 import '../controller/home_controller.dart';
 import '../../../core/common/shimmer/shimmer_loader.dart';
 import '../../../core/common/shimmer/shimmer_placeholders.dart';
+import '../screens/weekly_menu_items_details_screen.dart';
 
 class WeeklyMenuSlider extends StatefulWidget {
   const WeeklyMenuSlider({super.key});
@@ -71,7 +72,6 @@ class _WeeklyMenuSliderState extends State<WeeklyMenuSlider> {
           );
         }
 
-
         return PageView.builder(
           controller: _pageController,
           clipBehavior: Clip.none,
@@ -81,7 +81,14 @@ class _WeeklyMenuSliderState extends State<WeeklyMenuSlider> {
             final day = _controller.days[dayIndex];
             final items = weeklyMenu[day] ?? [];
 
-            return WeeklyMenuCard(day: day, items: items);
+            return GestureDetector(
+              onTap: () {
+                Get.to(
+                  () => WeeklyMenuItemsDetailsScreen(day: day, items: items),
+                );
+              },
+              child: WeeklyMenuCard(day: day, items: items),
+            );
           },
         );
       }),
@@ -158,5 +165,4 @@ class _WeeklyMenuSliderState extends State<WeeklyMenuSlider> {
       ),
     );
   }
-
 }

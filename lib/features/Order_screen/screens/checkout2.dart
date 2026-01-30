@@ -24,7 +24,8 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
   final orderController = Get.find<OrderController>();
   final profileController = Get.find<ProfileController>();
   DateTime? selectedDate;
-  TimeOfDay? selectedTime;
+  TimeOfDay? selectedStartTime;
+  TimeOfDay? selectedEndTime;
   String selectedPickupOption = "No";
 
   @override
@@ -42,47 +43,45 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
       Get.snackbar('Error', 'Please select a delivery date');
       return;
     }
-
-    String timeText = timeController.text.toLowerCase().trim();
-    int? totalMinutes;
-
-    if (timeText.contains("hr") || timeText.contains("hour")) {
-      String numericPart = timeText.replaceAll(RegExp(r'[a-z]'), '').trim();
-      double? hours = double.tryParse(numericPart);
-      if (hours != null) {
-        totalMinutes = (hours * 60).toInt();
-      }
-    } else {
-      String numericPart = timeText.replaceAll(RegExp(r'[a-z]'), '').trim();
-      totalMinutes = int.tryParse(numericPart);
+    if (selectedStartTime == null || selectedEndTime == null) {
+      Get.snackbar('Error', 'Please select a delivery time window');
+      return;
     }
 
-    if (totalMinutes == null || totalMinutes < 30) {
+    final scheduledFor = DateTime(
+      selectedDate!.year,
+      selectedDate!.month,
+      selectedDate!.day,
+      selectedStartTime!.hour,
+      selectedStartTime!.minute,
+    );
+
+    final scheduledTo = DateTime(
+      selectedDate!.year,
+      selectedDate!.month,
+      selectedDate!.day,
+      selectedEndTime!.hour,
+      selectedEndTime!.minute,
+    );
+
+    // Validation: delivery time cannot be less than 30 mins from now if today
+    final now = DateTime.now();
+    if (scheduledFor.isBefore(now.add(const Duration(minutes: 30)))) {
       Get.snackbar(
         'Invalid Time',
-        'Minimum delivery time is 30 mins. Please use formats like "30" or "1 hr"',
+        'Delivery time must be at least 30 minutes from now.',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
       return;
     }
 
-    final now = DateTime.now();
-    final calculatedTime = now.add(Duration(minutes: totalMinutes));
-
-    // Combine the date from selectedDate with the time part calculated from duration
-    final scheduledFor = DateTime(
-      selectedDate!.year,
-      selectedDate!.month,
-      selectedDate!.day,
-      calculatedTime.hour,
-      calculatedTime.minute,
-    );
-
     orderController.placeOrder(
       addressController.text,
       phoneController.text,
       scheduledFor,
+      scheduledTo,
+      selectedPickupOption == "Yes",
     );
   }
 
@@ -153,6 +152,65 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
             "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
       });
     }
+  }
+
+  Future<void> _selectTime(BuildContext context) async {
+    // 1. Pick Start Time
+    final TimeOfDay? startPicked = await showTimePicker(
+      context: context,
+      initialTime: selectedStartTime ?? TimeOfDay.now(),
+      initialEntryMode: TimePickerEntryMode.dial,
+      helpText: "Select Start Time",
+    );
+
+    if (startPicked == null) return;
+
+    // 2. Loop for End Time until valid or cancelled
+    TimeOfDay? endPicked;
+    bool isValidWindow = false;
+
+    while (!isValidWindow) {
+      endPicked = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay(
+          hour: (startPicked.hour + (startPicked.minute + 45) ~/ 60) % 24,
+          minute: (startPicked.minute + 45) % 60,
+        ),
+        initialEntryMode: TimePickerEntryMode.dial,
+        helpText: "Select End Time",
+      );
+
+      // User cancelled
+      if (endPicked == null) return;
+
+      // Validate: End time must be at least 30 minutes after Start time
+      final double startInMinutes =
+          startPicked.hour * 60 + startPicked.minute.toDouble();
+      final double endInMinutes =
+          endPicked.hour * 60 + endPicked.minute.toDouble();
+
+      if (endInMinutes < startInMinutes + 30) {
+        Get.snackbar(
+          'Invalid Window',
+          'Delivery window must be at least 30 minutes long. Please select again.',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        // Loop continues - will show picker again
+      } else {
+        isValidWindow = true;
+      }
+    }
+
+    // Valid selection made
+    final startText = startPicked.format(context);
+    final endText = endPicked!.format(context);
+
+    setState(() {
+      selectedStartTime = startPicked;
+      selectedEndTime = endPicked;
+      timeController.text = "$startText - $endText";
+    });
   }
 
   @override
@@ -263,7 +321,6 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
                       ),
                     ),
 
-
                     _divider(),
                     _buildTile(
                       imagePath: Images.calendar,
@@ -290,44 +347,20 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
                     _buildTile(
                       imagePath: Images.delivery,
                       title: "Estimated delivery time",
-                      child: TextFormField(
-                        controller: timeController,
-                        keyboardType: TextInputType.text,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Please enter delivery time";
-                          }
-                          String timeText = value.toLowerCase().trim();
-                          int? totalMinutes;
-
-                          if (timeText.contains("hr") ||
-                              timeText.contains("hour")) {
-                            String numericPart = timeText
-                                .replaceAll(RegExp(r'[a-z]'), '')
-                                .trim();
-                            double? hours = double.tryParse(numericPart);
-                            if (hours != null) {
-                              totalMinutes = (hours * 60).toInt();
-                            }
-                          } else {
-                            String numericPart = timeText
-                                .replaceAll(RegExp(r'[a-z]'), '')
-                                .trim();
-                            totalMinutes = int.tryParse(numericPart);
-                          }
-
-                          if (totalMinutes == null) {
-                            return "Invalid format (e.g. 30 mins, 1 hr)";
-                          }
-                          if (totalMinutes < 30) {
-                            return "Minimum duration is 30 mins";
-                          }
-                          return null;
-                        },
-                        decoration: const InputDecoration(
-                          hintText: "Minimum 30 minutes window",
-                          hintStyle: TextStyle(color: Colors.grey),
-                          border: InputBorder.none,
+                      child: InkWell(
+                        onTap: () => _selectTime(context),
+                        child: TextFormField(
+                          enabled: false,
+                          controller: timeController,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black,
+                          ),
+                          decoration: const InputDecoration(
+                            hintText: "Minimum 30 minute window",
+                            hintStyle: TextStyle(color: Colors.grey),
+                            border: InputBorder.none,
+                          ),
                         ),
                       ),
                     ),

@@ -82,6 +82,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
     );
   }
 
+
   Widget _ongoingList() {
     return Obx(() {
       if (orderController.isLoading.value) {
@@ -270,10 +271,10 @@ class _MyOrdersScreenState extends State<MyOrdersScreen>
                 style: const TextStyle(color: Colors.grey),
               ),
               Text(
-                DateFormat('dd MMM yyyy, hh:mm a').format(order.scheduledFor),
+                DateFormat('dd MMM yyyy, hh:mm a').format(order.scheduledFor),//hh:mm a//
                 style: const TextStyle(
                   fontWeight: FontWeight.w500,
-                  fontSize: 17,
+                  fontSize: 15,
                 ),
               ),
             ],

@@ -41,16 +41,7 @@ class WeeklyMenuCard extends StatelessWidget {
               const SizedBox(height: 9),
 
               // List (non-scrollable, limited to 4)
-              GestureDetector(
-                onTap: (){
-                  Get.to(
-                        () => WeeklyMenuItemsDetailsScreen(
-                      day: day,
-                      items: items,
-                    ),
-                  );
-                },
-                child: Row(
+              Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
@@ -125,7 +116,6 @@ class WeeklyMenuCard extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
             ],
           ),
         ),
