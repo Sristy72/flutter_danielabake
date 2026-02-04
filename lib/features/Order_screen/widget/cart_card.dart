@@ -1,3 +1,5 @@
+import 'package:danielabake/features/auth/controller/auth_controller.dart';
+import 'package:danielabake/features/profile_screens/controller/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../home/controller/cart_controller.dart';
@@ -132,6 +134,7 @@ class CartItemCard extends StatelessWidget {
                                 _squareButton(
                                   icon: Icons.remove,
                                   onTap: () {
+                                    Get.find<AuthController>().logout();
                                     if (quantity.value > 1) {
                                       quantity.value--;
                                       cartItem.quantity = quantity.value;

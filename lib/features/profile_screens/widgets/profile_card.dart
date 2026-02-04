@@ -1,9 +1,11 @@
 import 'package:danielabake/core/common/widgets/elevated_button.dart';
 import 'package:danielabake/core/constants/assets_const.dart';
 import 'package:danielabake/features/auth/controller/auth_controller.dart';
+import 'package:danielabake/features/profile_screens/controller/profile_controller.dart';
 import 'package:danielabake/features/profile_screens/screens/change_password_screen.dart';
 import 'package:danielabake/features/profile_screens/screens/favorite_items.dart';
 import 'package:danielabake/features/profile_screens/screens/my_orders_screen.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart' hide Icons;
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -31,6 +33,7 @@ class ProfileCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authController = Get.find<AuthController>();
+    final profileController = Get.find<ProfileController>();
 
     return Column(
       children: [
@@ -118,6 +121,41 @@ class ProfileCard extends StatelessWidget {
 
         SizedBox(height: 20,),
 
+
+        Container(
+          decoration: BoxDecoration(
+            color: Color(0x2EFFB972),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: GestureDetector(
+            onTap: (){profileController.deleteProfile();},
+            child: ListTile(
+              leading: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(50),
+                  color: Color(0xFFFFEFD5),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Icon(CupertinoIcons.delete, size: 20,color: Color(
+                      0xFFED1E19),),
+                ),
+              ),
+              title: const Text(
+                "Delete Profile",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              trailing:AppSvg(asset: Images.arrow),
+
+            ),
+          ),
+        ),
+
+        SizedBox(height: 10,),
+
         Container(
           decoration: BoxDecoration(
             color: Color(0x2EFFB972),
@@ -147,7 +185,9 @@ class ProfileCard extends StatelessWidget {
 
             ),
           ),
-        )
+        ),
+
+
 
       ],
     );

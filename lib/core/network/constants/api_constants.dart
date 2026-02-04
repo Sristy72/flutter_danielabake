@@ -69,6 +69,8 @@ class ProfileEndpoints {
       '${ApiConstants.baseUrl}/orders/my?filter=ongoing';
   final String fetchDelivered =
       '${ApiConstants.baseUrl}/orders/my?filter=completed';
+
+  String deleteProfile(String userId) => '${ApiConstants.baseUrl}/profile/$userId';
   // String fetchCategory(String userId) =>;
 }
 

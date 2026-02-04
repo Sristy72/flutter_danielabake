@@ -20,6 +20,7 @@ abstract class ProfileRepository {
   // NetworkResult<OngoingOrderResponseModel> fetchOngoingOrder();
   // NetworkResult<OngoingOrderResponseModel> fetchCompletedOrder();
   NetworkResult<List<GetFavoriteItemsResponseModel>> fetchFavoriteItems(String userId);
+  NetworkResult<void> deleteProfile(String userId);
   // NetworkResult<Category> fetchCategory(String userId);
 //
 //   NetworkResult<UserResponse> uploadPhoto(FormData request);

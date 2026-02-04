@@ -1,4 +1,5 @@
 import 'package:danielabake/core/base/base_controller.dart';
+import 'package:danielabake/features/Order_screen/controller/order_controller.dart';
 import 'package:danielabake/core/network/constants/key_constants.dart';
 import 'package:danielabake/core/network/models/refresh_token_request_model.dart';
 import 'package:danielabake/features/auth/controller/remember_me_controller.dart';
@@ -74,10 +75,10 @@ class AuthController extends BaseController {
   // Login
 
   Future<void> login(
-      RememberMeController? rememberMeController, {
-        required String email,
-        required String password,
-      }) async {
+    RememberMeController? rememberMeController, {
+    required String email,
+    required String password,
+  }) async {
     final request = LoginRequestModel(email: email, password: password);
 
     final result = await _authRepo.login(request);
@@ -85,11 +86,11 @@ class AuthController extends BaseController {
     DPrint.log("Login Response ${result.isRight()}");
 
     result.fold(
-          (fail) {
+      (fail) {
         setError(fail.message);
         setLoading(false);
       },
-          (success) async {
+      (success) async {
         // Extract user data
         final user = success.data.user;
 
@@ -109,10 +110,17 @@ class AuthController extends BaseController {
 
         // Navigate to home screen
         Get.offAll(() => NavigationMenu());
+
+        // Retry adding to cart if there was a pending item
+        try {
+          final orderController = Get.find<OrderController>();
+          await orderController.retryAddCartAfterLogin();
+        } catch (e) {
+          DPrint.log("Error retrying add to cart: $e");
+        }
       },
     );
   }
-
 
   //
   Future forgotPass(String email) async {
@@ -120,20 +128,18 @@ class AuthController extends BaseController {
     final result = await _authRepo.forgotPassword(request);
 
     result.fold(
-          (fail) {
+      (fail) {
         setError(fail.message);
         setLoading(false);
       },
-          (success) {
+      (success) {
         Get.off(() => VerifyCodeScreen(email: email)); //changed
         setLoading(false);
       },
     );
   }
 
-
   Future verifyOTP(String email, String otp) async {
-
     final request = VerifyOtpRequestModel(email: email, otp: otp);
     final result = await _authRepo.verifyOtp(request);
 
@@ -141,7 +147,6 @@ class AuthController extends BaseController {
       (fail) {
         setError(fail.message);
         DPrint.log("verify otp success result : ${fail.message}");
-
       },
       (success) {
         DPrint.log("verify otp success result : ${success.message}");
@@ -150,10 +155,7 @@ class AuthController extends BaseController {
     );
   }
 
-
-
   Future createNewPass(String email, String otp, String newPassword) async {
-
     final request = CreateNewPasswordRequestModel(
       email: email,
       otp: otp,
@@ -162,14 +164,12 @@ class AuthController extends BaseController {
     final result = await _authRepo.createNewPassword(request);
 
     result.fold(
-          (fail) {
+      (fail) {
         setError(fail.message);
         DPrint.log("New Password set failed result : ${fail.message}");
       },
-          (success) {
-        DPrint.log(
-          "New Password set successfully result : ${success.message}",
-        );
+      (success) {
+        DPrint.log("New Password set successfully result : ${success.message}");
         Get.offAll(LoginScreen());
       },
     );
@@ -186,25 +186,35 @@ class AuthController extends BaseController {
     final result = await _authRepo.refreshToken(request);
 
     final navi = result.fold(
-          (fail) {
+      (fail) {
         DPrint.log("Refresh token failed: ${fail.message}");
         return _isSuccess = false;
       },
-          (success) async {
+      (success) async {
         DPrint.log("Refresh token success: ${success.message}");
-        await _authStorageService.storeAccessToken(accessToken: success.data.accessToken);
-        await _authStorageService.storeRefreshToken(refreshToken: success.data.refreshToken);
+        await _authStorageService.storeAccessToken(
+          accessToken: success.data.accessToken,
+        );
+        await _authStorageService.storeRefreshToken(
+          refreshToken: success.data.refreshToken,
+        );
         //await _authStorageService.storeRefreshToken(success.data.refreshToken);
         return _isSuccess = true;
       },
     );
     return navi;
   }
+
   final SecureStoreServices _secureStoreServices = SecureStoreServices();
   //
   Future<void> logout() async {
+    if (Get.isRegistered<OrderController>()) {
+      Get.find<OrderController>().reset();
+    }
+
     await _authStorageService.clearAuthData();
     await _secureStoreServices.deleteData(KeyConstants.conversationId);
+
     Get.offAll(() => FirstScreen());
   }
 }

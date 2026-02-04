@@ -106,8 +106,6 @@ import 'package:danielabake/core/constants/assets_const.dart';
 import 'package:danielabake/navigation_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../home/screens/home_screen.dart';
-import '../controller/first_screen_controller.dart';
 
 class FirstScreen extends StatefulWidget {
   const FirstScreen({super.key});

@@ -277,15 +277,20 @@ class _HomeScreenState extends State<HomeScreen> {
                         isFavorite: isFavorite,
                         onAdd: () async {
                           try {
-                            await _cartController.addCart(item.id, 1);
-                            Get.snackbar(
-                              'Success',
-                              '${item.name} added to cart',
-                              backgroundColor: Colors.green,
-                              colorText: Colors.white,
-                              margin: const EdgeInsets.all(12),
-                              duration: const Duration(seconds: 2),
+                            final success = await _cartController.addCart(
+                              item.id,
+                              1,
                             );
+                            if (success) {
+                              Get.snackbar(
+                                'Success',
+                                '${item.name} added to cart',
+                                backgroundColor: Colors.green,
+                                colorText: Colors.white,
+                                margin: const EdgeInsets.all(12),
+                                duration: const Duration(seconds: 2),
+                              );
+                            }
                           } catch (e) {
                             Get.snackbar(
                               'Error',
@@ -294,19 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           }
                         },
                         onFavoriteToggle: (newValue) async {
-                          try {
-                            if (newValue) {
-                              await _favoriteFoodController.favorite(item.id);
-                              isFavorite.value = true;
-                            } else {
-                              await _favoriteFoodController.removeFavorite(
-                                item.id,
-                              );
-                              isFavorite.value = false;
-                            }
-                          } catch (e) {
-                            DPrint.log("Favorite toggle error: $e");
-                          }
+                          // Logic handled inside FoodCard
                         },
                         rating: item.rating,
                         reviewCount: item.reviewsCount,
@@ -376,15 +369,9 @@ class _HomeScreenState extends State<HomeScreen> {
               width: double.infinity,
               decoration: const BoxDecoration(
                 color: Color(0xFFFFEAD1),
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(16),
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
               ),
-              child: const Icon(
-                Icons.image,
-                size: 40,
-                color: Colors.white70,
-              ),
+              child: const Icon(Icons.image, size: 40, color: Colors.white70),
             ),
           ),
 

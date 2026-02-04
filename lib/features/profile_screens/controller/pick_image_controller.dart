@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:flutx_core/flutx_core.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 
@@ -24,19 +26,22 @@ class PickImageController {
                 title: const Text('Gallery'),
                 onTap: () async {
                   final XFile? image = await _picker.pickImage(
-                      source: ImageSource.gallery);
+                    source: ImageSource.gallery,
+                  );
                   if (image != null) selectedFile = File(image.path);
-                  Navigator.of(ctx).pop();
+                  Get.back();
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.camera_alt),
                 title: const Text('Camera'),
                 onTap: () async {
-                  final XFile? image =
-                  await _picker.pickImage(source: ImageSource.camera);
+                  DPrint.log("Camera Start");
+                  final XFile? image = await _picker.pickImage(
+                    source: ImageSource.camera,
+                  );
                   if (image != null) selectedFile = File(image.path);
-                  Navigator.of(ctx).pop();
+                  Get.back();
                 },
               ),
             ],

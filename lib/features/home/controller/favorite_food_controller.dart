@@ -30,16 +30,16 @@ class FavoriteFoodController extends BaseController {
       if (Get.isDialogOpen == true)
         return false; // Prevent double dialogs, return false
       Get.defaultDialog(
-        title: "Guest User",
-        middleText: "Please sign in to add favorites.",
+        title: "Not Sign in",
+        middleText: "Please sign in first to add favorites.",
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text("Cancel")),
+          TextButton(onPressed: () => Get.back(), child: const Text("Cancel", style: TextStyle(color: Colors.black),)),
           ElevatedButton(
             onPressed: () {
               Get.back(); // Close dialog
               Get.to(() => const LoginScreen());
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+            style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF7F3615)),
             child: const Text("Sign In", style: TextStyle(color: Colors.white)),
           ),
         ],

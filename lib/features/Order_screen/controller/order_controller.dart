@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../../core/base/base_controller.dart';
 import '../../../core/network/services/auth_storage_service.dart';
+import '../../auth/screens/login_screen.dart';
 import '../../home/models/request/cart_request_model.dart';
 import '../../home/models/request/remove_cart_request_model.dart';
 import '../../home/repositories/cart_repository.dart';
@@ -41,10 +42,10 @@ class OrderController extends BaseController {
 
   Future<void> fetchCart() async {
     final userId = await _authStorageService.getUserId();
-    DPrint.log('UserId: $userId');
+    // DPrint.log('UserId: $userId');
     if (userId == null || userId.isEmpty) {
       setError('User ID not found. Please log in again.');
-      Get.snackbar('Error', 'User ID not found. Please log in again.');
+      // Get.snackbar('Error', 'User ID not found. Please log in again.');
       setLoading(false);
       return;
     }
@@ -63,22 +64,52 @@ class OrderController extends BaseController {
     );
   }
 
-  Future<void> addCart(String itemId, int quantity) async {
+  // Pending item storage
+  String? _pendingItemId;
+  int? _pendingItemQuantity;
+
+  Future<bool> addCart(String itemId, int quantity) async {
     final userId = await _authStorageService.getUserId();
     if (userId == null || userId.isEmpty) {
-      setError('User ID not found. Please log in again.');
-      // Get.snackbar('Error', 'User ID not found. Please log in again.');
+      // Store pending item
+      _pendingItemId = itemId;
+      _pendingItemQuantity = quantity;
+
+      if (Get.isDialogOpen == true) return false; // Prevent double dialogs
+      Get.defaultDialog(
+        title: "Not Sign in",
+        middleText: "Please sign in to add items to cart.",
+        actions: [
+          TextButton(
+            onPressed: () {
+              // Clear pending item on cancel
+              _pendingItemId = null;
+              _pendingItemQuantity = null;
+              Get.back();
+            },
+            child: const Text("Cancel", style: TextStyle(color: Colors.black),),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Get.back(); // Close dialog
+              Get.to(() => const LoginScreen());
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Color(0xFF7F3615)),
+            child: const Text("Sign In", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      );
       setLoading(false);
-      return;
+      return false; // User not logged in
     }
+
+    setLoading(true); // optional: show loading
 
     final request = AddItemRequest(
       userId: userId,
       itemId: itemId,
       quantity: quantity,
     );
-
-    setLoading(true); // optional: show loading
 
     final result = await _addCartRepo.addCart(
       request,
@@ -87,41 +118,42 @@ class OrderController extends BaseController {
       quantity,
     );
 
-    result.fold(
+    return result.fold(
       (fail) {
         setError(fail.message);
         Get.snackbar('Error', fail.message);
         setLoading(false);
+        return false; // Failed
       },
       (success) async {
-        // SUCCESS: Now refresh the cart locally
-        // Get.snackbar(
-        //   "Success",
-        //   "Item added to cart",
-        //   backgroundColor: Colors.green,
-        //   colorText: Colors.white,
-        //   snackPosition: SnackPosition.BOTTOM,
-        //   margin: const EdgeInsets.all(12),
-        //   duration: const Duration(seconds: 2),
-        // );
-
         // Option 1: Best - Re-fetch the entire cart (most reliable)
         await fetchCart(); // This will update cart.value → triggers Obx → badge appears
 
-        // OR Option 2: If you want to avoid extra API call, manually update (less safe)
-        // final currentCart = cart.value ?? GetCartResponseModel(items: []);
-        // final existingItem = currentCart.items.firstWhereOrNull((e) => e.item.id == itemId);
-        // if (existingItem != null) {
-        //   existingItem.quantity += quantity;
-        // } else {
-        //   // You'd need to have item details here - usually not available
-        // }
-        // cart.value = currentCart;
-        // cart.refresh();
-
         setLoading(false);
+        return true; // Success
       },
     );
+  }
+
+  Future<void> retryAddCartAfterLogin() async {
+    if (_pendingItemId != null && _pendingItemQuantity != null) {
+      DPrint.log("Retrying pending cart item: $_pendingItemId");
+      final success = await addCart(_pendingItemId!, _pendingItemQuantity!);
+      if (success) {
+        Get.snackbar(
+          "Success",
+          "Pending item added to cart",
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+          margin: const EdgeInsets.all(12),
+          duration: const Duration(seconds: 2),
+        );
+      }
+      // Clear after retry (successful or not to prevent infinite loops/stale data)
+      _pendingItemId = null;
+      _pendingItemQuantity = null;
+    }
   }
 
   Future<void> removeCart(String itemId) async {
@@ -302,5 +334,10 @@ class OrderController extends BaseController {
         Get.offAll(() => NavigationMenu());
       },
     );
+  }
+
+  void reset() {
+    cart.value = null;
+    isLoading.value = false;
   }
 }

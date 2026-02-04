@@ -68,6 +68,14 @@ NetworkResult<List<GetFavoriteItemsResponseModel>> fetchFavoriteItems(String use
     );
   }
 
+
+  NetworkResult<void> deleteProfile(String userId){
+    return _apiClient.delete(
+      endpoint:ApiConstants.profile.deleteProfile(userId),
+      fromJsonT: (json) => [],
+    );
+  }
+
   // NetworkResult<Category> fetchCategory(String userId){
   //   return _apiClient.get(endpoint: ApiConstants.profile.fetchProfile(userId), fromJsonT: (json) =>
   //       GetProfileResponseModel.fromJson(json as Map<String, dynamic>),

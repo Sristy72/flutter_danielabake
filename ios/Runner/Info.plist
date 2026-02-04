@@ -47,5 +47,7 @@
     <true/>
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Allows the app to access your photo library to select images for upload, sharing, or other app features.</string>
+    <key>NSCameraUsageDescription</key>
+    <string>Allows the app to access your camera to capture images for profile picture updates.</string>
   </dict>
 </plist>

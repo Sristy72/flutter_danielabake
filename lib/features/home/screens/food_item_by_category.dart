@@ -28,7 +28,7 @@ class _FoodListScreenState extends State<FoodListScreen> {
   final _favoriteFoodController = Get.find<FavoriteFoodController>();
   final _cartController = Get.find<OrderController>();
   final controller = Get.put(CategoryController());
- // create controller if not exists
+  // create controller if not exists
   @override
   Widget build(BuildContext context) {
     controller.fetchItems(widget.categoryId); // fetch API
@@ -50,7 +50,10 @@ class _FoodListScreenState extends State<FoodListScreen> {
         title: Text(
           widget.categoryName,
           style: const TextStyle(
-              color: Colors.black, fontWeight: FontWeight.w600, fontSize: 18),
+            color: Colors.black,
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+          ),
         ),
       ),
       body: Obx(() {
@@ -69,7 +72,7 @@ class _FoodListScreenState extends State<FoodListScreen> {
           padding: const EdgeInsets.all(12),
           child: GridView.builder(
             itemCount: foods.length,
-            gridDelegate:  SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: gridCount,
               mainAxisExtent: 255,
               crossAxisSpacing: width * 0.035,
@@ -83,15 +86,19 @@ class _FoodListScreenState extends State<FoodListScreen> {
 
               return GestureDetector(
                 onTap: () {
-                  Get.to(() => FoodDetailScreen(
-                    food: FoodModel(
-                      title: food.name,
-                      description: food.description,
-                      image: food.image,
-                      ingredients: food.ingredients, price: food.price.toString(), id: food.id,
-                      //rating: food.rating, reviewsCount: food.reviewsCount,
+                  Get.to(
+                    () => FoodDetailScreen(
+                      food: FoodModel(
+                        title: food.name,
+                        description: food.description,
+                        image: food.image,
+                        ingredients: food.ingredients,
+                        price: food.price.toString(),
+                        id: food.id,
+                        //rating: food.rating, reviewsCount: food.reviewsCount,
+                      ),
                     ),
-                  ));
+                  );
                 },
                 child: FoodCard(
                   imagePath: food.image,
@@ -102,25 +109,22 @@ class _FoodListScreenState extends State<FoodListScreen> {
                   isFavorite: isFavorite,
                   onAdd: () async {
                     try {
-                      await _cartController.addCart(food.id, 1);
-                      Get.snackbar('Success', '${food.name} added to cart');
+                      final success = await _cartController.addCart(food.id, 1);
+                      if (success) {
+                        Get.snackbar('Success', '${food.name} added to cart');
+                      }
                     } catch (e) {
-                      Get.snackbar('Error', 'Failed to add ${food.name} to cart');
+                      Get.snackbar(
+                        'Error',
+                        'Failed to add ${food.name} to cart',
+                      );
                     }
                   },
                   onFavoriteToggle: (newValue) async {
-                    try {
-                      if (newValue) {
-                        await _favoriteFoodController.favorite(food.id);
-                        isFavorite.value = true;
-                      } else {
-                        await _favoriteFoodController.removeFavorite(food.id);
-                        isFavorite.value = false;
-                      }
-                    } catch (e) {
-                      DPrint.log("Favorite toggle error: $e");
-                    }
-                  }, rating: food.rating, reviewCount: food.reviewsCount,
+                    // Logic handled inside FoodCard
+                  },
+                  rating: food.rating,
+                  reviewCount: food.reviewsCount,
                 ),
               );
             },

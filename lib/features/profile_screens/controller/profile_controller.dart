@@ -1,9 +1,12 @@
 import 'dart:developer' as DPrint;
 import 'dart:io';
+import 'package:danielabake/features/auth/controller/auth_controller.dart';
+import 'package:danielabake/features/home/screens/home_screen.dart';
 import 'package:danielabake/features/profile_screens/models/request/current_password_update_request_model.dart';
 import 'package:danielabake/features/profile_screens/models/response/get_favorite_items_response_model.dart';
 import 'package:danielabake/features/profile_screens/models/response/get_profile_response_model.dart';
 import 'package:danielabake/features/profile_screens/models/response/ongoing_order_response_model.dart';
+
 import 'package:get/get.dart';
 import '../../../../core/base/base_controller.dart';
 import '../../../core/network/services/auth_storage_service.dart';
@@ -48,6 +51,31 @@ class ProfileController extends BaseController {
       (success) {
         userInfo.value = success.data;
         DPrint.log(success.message);
+      },
+    );
+  }
+
+  Future<void> deleteProfile() async {
+    final userId = await _authStorageService.getUserId();
+    DPrint.log('UserId: $userId');
+    if (userId == null || userId.isEmpty) {
+      isGuest.value = true;
+      setLoading(false);
+      return;
+    } else {
+      isGuest.value = false;
+    }
+
+    final result = await _profileRepository.deleteProfile(userId);
+
+    result.fold(
+      (fail) {
+        setError(fail.message);
+        DPrint.log('data fetch failed');
+      },
+      (success) {
+        DPrint.log(success.message);
+        Get.find<AuthController>().logout();
       },
     );
   }

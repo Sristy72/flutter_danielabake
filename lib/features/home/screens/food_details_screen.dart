@@ -29,8 +29,6 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
   final AuthStorageService _authStorageService = AuthStorageService();
   final RxString selectedImage = ''.obs;
 
-
-
   final Rx<String?> currentUserId = Rx<String?>(null);
   final RxInt quantity = 0.obs;
 
@@ -40,7 +38,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
     selectedImage.value = widget.food.image;
     _initializeQuantity();
     ratingController.getReview(widget.food.id);
-    _loadCurrentUserId();// Fetch reviews
+    _loadCurrentUserId(); // Fetch reviews
   }
 
   // No setState needed anymore
@@ -118,14 +116,19 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                         ),
                         _squareButton(
                           icon: Icons.add,
-                          onTap: () {
-                            quantity.value++;
-
+                          onTap: () async {
                             /// call add API
-                            _orderController.addCart(widget.food.id, 1);
+                            final success = await _orderController.addCart(
+                              widget.food.id,
+                              1,
+                            );
 
-                            /// refresh cart after adding
-                            _orderController.fetchCart();
+                            if (success) {
+                              quantity.value++;
+
+                              /// refresh cart after adding
+                              _orderController.fetchCart();
+                            }
                           },
                         ),
                       ],
@@ -135,24 +138,24 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                 const SizedBox(height: 15),
 
                 PrimaryButton(
-                    text: 'Place Order',
-                    key: const Key("food-details-screen"),
-                    onSimplePressed: () {
-                      if (quantity.value == 0) {
-                        Get.snackbar(
-                          'No Item Added',
-                          'First add an item to place your order',
-                          snackPosition: SnackPosition.BOTTOM,
-                          backgroundColor: Colors.white24,
-                          colorText: Colors.black,
-                          margin: const EdgeInsets.all(12),
-                          borderRadius: 10,
-                          duration: const Duration(seconds: 2),
-                        );
-                        return;
-                      }
-                      Get.to(() => Checkout2Screen());
-                    },
+                  text: 'Place Order',
+                  key: const Key("food-details-screen"),
+                  onSimplePressed: () {
+                    if (quantity.value == 0) {
+                      Get.snackbar(
+                        'No Item Added',
+                        'First add an item to place your order',
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: Colors.white24,
+                        colorText: Colors.black,
+                        margin: const EdgeInsets.all(12),
+                        borderRadius: 10,
+                        duration: const Duration(seconds: 2),
+                      );
+                      return;
+                    }
+                    Get.to(() => Checkout2Screen());
+                  },
                 ),
               ],
             ),
@@ -166,7 +169,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
           children: [
             /// Food Image
             Padding(
-              padding: const EdgeInsets.only(left: 18.0,right: 18, ),
+              padding: const EdgeInsets.only(left: 18.0, right: 18),
               child: Center(
                 child: Container(
                   width: double.infinity,
@@ -175,7 +178,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: Obx(
-                      ()=> ClipRRect(
+                    () => ClipRRect(
                       borderRadius: BorderRadius.circular(15),
                       child: Image.network(selectedImage.value),
                     ),
@@ -205,7 +208,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                           selectedImage.value = image; // 👈 GetX update
                         },
                         child: Obx(
-                              () => ClipRRect(
+                          () => ClipRRect(
                             borderRadius: BorderRadius.circular(12),
                             child: Container(
                               decoration: BoxDecoration(
@@ -267,43 +270,41 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
             ),
 
             //add ingredients image and name
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Wrap(
-              spacing: 14,
-              runSpacing: 14,
-              children: widget.food.ingredients.map((ingredient) {
-                return Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: const BoxDecoration(
-                        color: Color(0x2EFFB972),
-                        shape: BoxShape.circle,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Wrap(
+                spacing: 14,
+                runSpacing: 14,
+                children: widget.food.ingredients.map((ingredient) {
+                  return Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: const BoxDecoration(
+                          color: Color(0x2EFFB972),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Image.network(
+                          ingredient.image ?? '',
+                          height: 45,
+                          width: 45,
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) =>
+                              const Icon(Icons.fastfood, size: 30),
+                        ),
                       ),
-                      child: Image.network(
-                        ingredient.image ?? '',
-                        height: 45,
-                        width: 45,
-                        fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) =>
-                        const Icon(Icons.fastfood, size: 30),
+                      const SizedBox(height: 6),
+                      Text(
+                        ingredient.name,
+                        style: const TextStyle(fontSize: 12),
                       ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      ingredient.name,
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ],
-                );
-              }).toList(),
+                    ],
+                  );
+                }).toList(),
+              ),
             ),
-          ),
 
-
-
-          // /// Ingredients Section
+            // /// Ingredients Section
             // Padding(
             //   padding: const EdgeInsets.symmetric(horizontal: 12.0),
             //   child: Wrap(
@@ -345,9 +346,8 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
             //         .toList(),
             //   ),
             // ),
-
             const SizedBox(height: 20),
-            
+
             // Padding(
             //   padding: const EdgeInsets.only(top: 12.0, left: 12, right: 12),
             //   child: Row(

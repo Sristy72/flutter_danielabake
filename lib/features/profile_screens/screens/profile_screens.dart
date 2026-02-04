@@ -119,7 +119,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Get.to(() => const LoginScreen());
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange, // Match app theme
+                        backgroundColor: Color(0xFF7F3615), // Match app theme
                         padding: const EdgeInsets.symmetric(
                           horizontal: 32,
                           vertical: 12,
