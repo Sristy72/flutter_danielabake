@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'dart:developer' as DPrint;
 
 import '../../home/controller/favorite_food_controller.dart';
-
+import '../../Order_screen/controller/order_controller.dart';
 
 class FavoriteFoodCard extends StatelessWidget {
   final String imagePath;
@@ -35,7 +35,8 @@ class FavoriteFoodCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final FavoriteFoodController favoriteController =
-    Get.find<FavoriteFoodController>();
+        Get.find<FavoriteFoodController>();
+    final OrderController cartController = Get.find<OrderController>();
 
     return Container(
       // Remove width and height here — let GridView control it
@@ -124,7 +125,7 @@ class FavoriteFoodCard extends StatelessWidget {
                     ),
 
                     Obx(
-                          () => InkWell(
+                      () => InkWell(
                         onTap: () async {
                           try {
                             final newValue = !isFavorite.value;
@@ -230,13 +231,53 @@ class FavoriteFoodCard extends StatelessWidget {
                     fontSize: 14,
                   ),
                 ),
-                InkWell(
-                  onTap: onAdd,
-                  child: const CircleAvatar(
-                    radius: 12,
-                    backgroundColor: Color(0xFF0066FF),
-                    child: Icon(Icons.add, color: Colors.white, size: 20),
-                  ),
+                Row(
+                  children: [
+                    Obx(() {
+                      final quantity = cartController.getItemQuantity(itemId);
+                      if (quantity > 0) {
+                        return Row(
+                          children: [
+                            InkWell(
+                              onTap: () =>
+                                  cartController.removeOneItemFromCart(itemId),
+                              child: const CircleAvatar(
+                                radius: 12,
+                                backgroundColor: Color(0xFFE0E0E0),
+                                child: Icon(
+                                  Icons.remove,
+                                  color: Colors.black,
+                                  size: 20,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 5,
+                              ),
+                              child: Text(
+                                '$quantity',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                  color: Color(0xFF7F3615),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    }),
+                    InkWell(
+                      onTap: onAdd,
+                      child: const CircleAvatar(
+                        radius: 12,
+                        backgroundColor: Color(0xFF0066FF),
+                        child: Icon(Icons.add, color: Colors.white, size: 20),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

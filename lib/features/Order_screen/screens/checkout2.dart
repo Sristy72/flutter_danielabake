@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:danielabake/features/Order_screen/controller/order_controller.dart';
 import 'package:danielabake/features/profile_screens/controller/profile_controller.dart';
 import 'package:flutter/material.dart';
@@ -18,9 +19,11 @@ class Checkout2Screen extends StatefulWidget {
 class _Checkout2ScreenState extends State<Checkout2Screen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController addressController = TextEditingController();
+  final TextEditingController billingController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController dateController = TextEditingController();
   final TextEditingController timeController = TextEditingController();
+  final ScrollController _billingScrollController = ScrollController();
   final orderController = Get.find<OrderController>();
   final profileController = Get.find<ProfileController>();
   DateTime? selectedDate;
@@ -122,6 +125,12 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
+            datePickerTheme: const DatePickerThemeData(
+              headerHelpStyle: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+              ),
+            ),
             colorScheme: const ColorScheme.light(
               primary: Color(0xFFAD653F),
               onPrimary: Colors.white,
@@ -279,133 +288,212 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: Column(
-            children: [
-              // The main container with address, phone, delivery
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: const Color(0x2EFFB972),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildTile(
-                      imagePath: Images.address,
-                      title: "Delivery Location",
-                      child: TextFormField(
-                        controller: addressController,
-                        validator: Validators.addressAndCity,
-                        decoration: const InputDecoration(
-                          hintText: "Enter address and city",
-                          hintStyle: TextStyle(color: Colors.grey),
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
-
-                    _divider(),
-                    _buildTile(
-                      imagePath: Images.phone,
-                      title: "Phone",
-                      child: TextFormField(
-                        validator: Validators.phone,
-                        keyboardType: TextInputType.phone,
-                        controller: phoneController,
-                        decoration: const InputDecoration(
-                          hintText: "+88 00-1111-2222",
-                          hintStyle: TextStyle(color: Colors.grey),
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
-
-                    _divider(),
-                    _buildTile(
-                      imagePath: Images.calendar,
-                      title: "Delivery Date",
-                      child: InkWell(
-                        onTap: () => _selectDate(context),
-                        child: TextFormField(
-                          enabled: false,
-                          controller: dateController,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.black,
-                          ),
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                // The main container with address, phone, delivery
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: const Color(0x2EFFB972),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildTile(
+                        imagePath: Images.address,
+                        title: "Picking up order",
+                        child: DropdownButtonFormField<String>(
+                          value: selectedPickupOption,
+                          items: ["Yes", "No"].map((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(
+                                value,
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (newValue) {
+                            setState(() {
+                              selectedPickupOption = newValue!;
+                            });
+                          },
                           decoration: const InputDecoration(
-                            hintText: "Select delivery date",
-                            hintStyle: TextStyle(color: Colors.grey),
                             border: InputBorder.none,
+                            contentPadding: EdgeInsets.zero,
+                            isDense: true,
                           ),
+                          icon: Icon(Icons.keyboard_arrow_down, size: 20),
+                          dropdownColor: const Color(0xFFFFF9F2),
                         ),
                       ),
-                    ),
+                      _divider(),
 
-                    _divider(),
-                    _buildTile(
-                      imagePath: Images.delivery,
-                      title: "Estimated delivery time",
-                      child: InkWell(
-                        onTap: () => _selectTime(context),
-                        child: TextFormField(
-                          enabled: false,
-                          controller: timeController,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.black,
-                          ),
-                          decoration: const InputDecoration(
-                            hintText: "Minimum 30 minute window",
-                            hintStyle: TextStyle(color: Colors.grey),
-                            border: InputBorder.none,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    _divider(),
-                    _buildTile(
-                      imagePath: Images.address,
-                      title: "Picking up order",
-                      child: DropdownButtonFormField<String>(
-                        value: selectedPickupOption,
-                        items: ["Yes", "No"].map((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(
-                              value,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.black,
+                      selectedPickupOption == "Yes"
+                          ? ImageFiltered(
+                              imageFilter: ImageFilter.blur(
+                                sigmaX: 1.5,
+                                sigmaY: 1.5,
+                              ),
+                              child: Opacity(
+                                opacity: 0.5,
+                                child: _buildTile(
+                                  imagePath: Images.address,
+                                  title: "Delivery Location",
+                                  child: TextFormField(
+                                    controller: addressController,
+                                    enabled: false,
+                                    validator: null,
+                                    decoration: const InputDecoration(
+                                      hintText: "Enter address and city",
+                                      hintStyle: TextStyle(color: Colors.grey),
+                                      border: InputBorder.none,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : _buildTile(
+                              imagePath: Images.address,
+                              title: "Delivery Location",
+                              child: TextFormField(
+                                controller: addressController,
+                                enabled: true,
+                                validator: Validators.addressAndCity,
+                                decoration: const InputDecoration(
+                                  hintText: "Enter address and city",
+                                  hintStyle: TextStyle(color: Colors.grey),
+                                  border: InputBorder.none,
+                                ),
                               ),
                             ),
-                          );
-                        }).toList(),
-                        onChanged: (newValue) {
-                          setState(() {
-                            selectedPickupOption = newValue!;
-                          });
-                        },
-                        decoration: const InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.zero,
-                          isDense: true,
+
+                      _divider(),
+                      _buildTile(
+                        imagePath: Images.phone,
+                        title: "Phone",
+                        child: TextFormField(
+                          validator: Validators.phone,
+                          keyboardType: TextInputType.phone,
+                          controller: phoneController,
+                          decoration: const InputDecoration(
+                            hintText: "+88 00-1111-2222",
+                            hintStyle: TextStyle(color: Colors.grey),
+                            border: InputBorder.none,
+                          ),
                         ),
-                        icon: Icon(Icons.keyboard_arrow_down, size: 20),
-                        dropdownColor: const Color(0xFFFFF9F2),
+                      ),
+
+                      _divider(),
+                      _buildTile(
+                        imagePath: Images.calendar,
+                        title: "Delivery Date",
+                        child: InkWell(
+                          onTap: () => _selectDate(context),
+                          child: TextFormField(
+                            enabled: false,
+                            controller: dateController,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
+                            decoration: const InputDecoration(
+                              hintText: "Select delivery date",
+                              hintStyle: TextStyle(color: Colors.grey),
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      _divider(),
+                      _buildTile(
+                        imagePath: Images.delivery,
+                        title: "Estimated delivery time",
+                        child: InkWell(
+                          onTap: () => _selectTime(context),
+                          child: TextFormField(
+                            enabled: false,
+                            controller: timeController,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
+                            decoration: const InputDecoration(
+                              hintText: "Minimum 30 minute window",
+                              hintStyle: TextStyle(color: Colors.grey),
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+
+              SizedBox(height: 50,),
+
+                Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.topLeft,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 5.0),
+                        child: Text('Billing Information', style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),),
+                      ),
+                    ),
+                    SizedBox(height: 5,),
+                    Container(
+                      height: 150,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0x2EFFB972),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Scrollbar(
+                        controller: _billingScrollController,
+                        thumbVisibility: true,
+                        interactive: true,
+                        child: TextFormField(
+                          controller: billingController,
+                          scrollController: _billingScrollController,
+                          maxLines: null, // allows unlimited lines
+                          keyboardType: TextInputType.multiline,
+                          textInputAction: TextInputAction.newline,
+                          scrollPhysics: const BouncingScrollPhysics(),
+                          decoration: const InputDecoration(
+                            hintText: "Enter your notes",
+                            hintStyle: TextStyle(color: Colors.grey),
+                            border: InputBorder.none,
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
+
+              ],
           ),
         ),
-      ),
+      ),)
     );
   }
+
+  @override
+  void dispose() {
+    _billingScrollController.dispose();
+    super.dispose();
+  }
+
 
   Widget _divider() {
     return const Padding(
@@ -415,26 +503,29 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
   }
 
   Widget _buildTile({
-    required String imagePath,
+    String? imagePath,
     String? suffixImagePath,
     required String title,
     required Widget child,
+    double verticalPadding = 6.0,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: verticalPadding),
       child: Row(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              color: Color(0xFFFFEFD5),
-              borderRadius: BorderRadius.circular(44),
+          if (imagePath != null) ...[
+            Container(
+              decoration: BoxDecoration(
+                color: Color(0xFFFFEFD5),
+                borderRadius: BorderRadius.circular(44),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: AppSvg(asset: imagePath, width: 22, height: 22),
+              ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: AppSvg(asset: imagePath, width: 22, height: 22),
-            ),
-          ),
-          const SizedBox(width: 10),
+            const SizedBox(width: 10),
+          ],
 
           Expanded(
             child: Column(

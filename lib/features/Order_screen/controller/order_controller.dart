@@ -87,7 +87,7 @@ class OrderController extends BaseController {
               _pendingItemQuantity = null;
               Get.back();
             },
-            child: const Text("Cancel", style: TextStyle(color: Colors.black),),
+            child: const Text("Cancel", style: TextStyle(color: Colors.black)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -176,6 +176,8 @@ class OrderController extends BaseController {
         Get.snackbar(
           "Removed",
           "Item removed from cart",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
           snackPosition: SnackPosition.BOTTOM,
           duration: const Duration(seconds: 2),
         );
@@ -228,11 +230,14 @@ class OrderController extends BaseController {
         DPrint.log("Favorite success result : ${fail.message}");
         setLoading(false);
       },
-      (success) {
+      (success) async {
         DPrint.log("Favorite success result : ${success.message}");
+        await fetchCart();
         Get.snackbar(
-          "Success",
-          "Item removed from favorites",
+          "Removed",
+          "Item removed from cart",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
           snackPosition: SnackPosition.BOTTOM,
         );
         setLoading(false);
@@ -339,5 +344,13 @@ class OrderController extends BaseController {
   void reset() {
     cart.value = null;
     isLoading.value = false;
+  }
+
+  int getItemQuantity(String itemId) {
+    if (cart.value == null) return 0;
+    final item = cart.value!.items.firstWhereOrNull(
+      (e) => e.item?.id == itemId,
+    );
+    return item?.quantity ?? 0;
   }
 }

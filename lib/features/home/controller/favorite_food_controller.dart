@@ -33,7 +33,10 @@ class FavoriteFoodController extends BaseController {
         title: "Not Sign in",
         middleText: "Please sign in first to add favorites.",
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text("Cancel", style: TextStyle(color: Colors.black),)),
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text("Cancel", style: TextStyle(color: Colors.black)),
+          ),
           ElevatedButton(
             onPressed: () {
               Get.back(); // Close dialog
@@ -59,6 +62,13 @@ class FavoriteFoodController extends BaseController {
       },
       (success) {
         DPrint.log("Favorite success result : ${success.data.id}");
+        Get.snackbar(
+          "Success",
+          "Item added to favorites",
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM,
+        );
         return true; // Return true on success
       },
     );

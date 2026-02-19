@@ -48,10 +48,10 @@ class AuthenticateCheckService extends BaseController {
     try {
       if (success.accessToken != null && success.refreshToken != null) {
         await _authStorageService.storeAccessToken(
-          accessToken: success.accessToken!,
+          accessToken: success.accessToken,
         );
         await _authStorageService.storeRefreshToken(
-          refreshToken: success.accessToken!,
+          refreshToken: success.accessToken,
         );
       }
 

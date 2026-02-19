@@ -53,7 +53,7 @@ class AuthStorageService {
     await _secureStorage.write(key: KeyConstants.userId, value: userId);
   }
 
-  // Check user authenticater or not
+  // Check user authenticate or not
   Future<bool> isAuthenticated() async {
     final accessToken = await getAccessToken();
     return accessToken != null && accessToken.isNotEmpty;
