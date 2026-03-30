@@ -28,6 +28,8 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
   final ratingController = Get.find<RatingController>();
   final AuthStorageService _authStorageService = AuthStorageService();
   final RxString selectedImage = ''.obs;
+  
+  final PageController _pageController = PageController();
 
   final Rx<String?> currentUserId = Rx<String?>(null);
   final RxInt quantity = 0.obs;
@@ -39,6 +41,12 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
     _initializeQuantity();
     ratingController.getReview(widget.food.id);
     _loadCurrentUserId(); // Fetch reviews
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
   // No setState needed anymore
@@ -177,11 +185,32 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
                   ),
-                  child: Obx(
-                    () => ClipRRect(
-                      borderRadius: BorderRadius.circular(15),
-                      child: Image.network(selectedImage.value),
-                    ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(15),
+                    child: (widget.food.images != null && widget.food.images!.isNotEmpty)
+                        ? PageView.builder(
+                            controller: _pageController,
+                            itemCount: widget.food.images!.length,
+                            onPageChanged: (index) {
+                              selectedImage.value = widget.food.images![index];
+                            },
+                            itemBuilder: (context, index) {
+                              return Image.network(
+                                widget.food.images![index],
+                                //fit: BoxFit.contain,
+                                errorBuilder: (_, __, ___) => const Center(
+                                    child: Icon(Icons.image_not_supported)),
+                              );
+                            },
+                          )
+                        : Obx(
+                            () => Image.network(
+                              selectedImage.value,
+                              //fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Center(
+                                  child: Icon(Icons.image_not_supported)),
+                            ),
+                          ),
                   ),
                 ),
               ),
@@ -206,6 +235,13 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                       return GestureDetector(
                         onTap: () {
                           selectedImage.value = image; // 👈 GetX update
+                          if (_pageController.hasClients) {
+                             _pageController.animateToPage(
+                               index,
+                               duration: const Duration(milliseconds: 300),
+                               curve: Curves.easeInOut,
+                             );
+                          }
                         },
                         child: Obx(
                           () => ClipRRect(
@@ -214,7 +250,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                               decoration: BoxDecoration(
                                 border: Border.all(
                                   color: selectedImage.value == image
-                                      ? Colors.orange
+                                      ? Color(0x991566CD)
                                       : Colors.transparent,
                                   width: 2,
                                 ),
@@ -223,7 +259,7 @@ class _FoodDetailScreenState extends State<FoodDetailScreen> {
                                 image,
                                 width: 80,
                                 height: 80,
-                                fit: BoxFit.cover,
+                               fit: BoxFit.fill,
                                 errorBuilder: (_, __, ___) => Container(
                                   width: 80,
                                   height: 80,

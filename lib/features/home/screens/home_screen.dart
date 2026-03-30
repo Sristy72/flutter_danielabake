@@ -29,7 +29,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final _homeController = Get.find<HomeController>();
-  final _favoriteFoodController = Get.find<FavoriteFoodController>();
   final _cartController = Get.find<OrderController>();
 
   final RxString selectedDay = 'Today'.obs;

@@ -105,6 +105,30 @@ class OrderController extends BaseController {
 
     setLoading(true); // optional: show loading
 
+    // --- Optimistic Update ---
+    final currentCart = cart.value;
+    bool isNewItem = false;
+    CartItem? newItemMock;
+    
+    if (currentCart != null) {
+      final existingItem = currentCart.items.firstWhereOrNull(
+        (e) => e.item?.id == itemId,
+      );
+      if (existingItem != null) {
+        existingItem.quantity += quantity;
+      } else {
+        isNewItem = true;
+        newItemMock = CartItem(
+          id: 'temp_id',
+          item: ItemDetails(id: itemId, name: 'Loading...', description: '', price: 0, image: ''),
+          quantity: quantity,
+        );
+        currentCart.items.add(newItemMock);
+      }
+      cart.refresh();
+    }
+    // --------------------------
+
     final request = AddItemRequest(
       userId: userId,
       itemId: itemId,
@@ -120,6 +144,24 @@ class OrderController extends BaseController {
 
     return result.fold(
       (fail) {
+        // --- Revert Optimistic Update ---
+        if (currentCart != null) {
+          if (isNewItem && newItemMock != null) {
+            currentCart.items.remove(newItemMock);
+          } else {
+            final existingItem = currentCart.items.firstWhereOrNull(
+              (e) => e.item?.id == itemId,
+            );
+            if (existingItem != null) {
+              existingItem.quantity -= quantity;
+              if (existingItem.quantity <= 0) {
+                 currentCart.items.remove(existingItem);
+              }
+            }
+          }
+          cart.refresh();
+        }
+        // --------------------------------
         setError(fail.message);
         Get.snackbar('Error', fail.message);
         setLoading(false);
@@ -217,6 +259,33 @@ class OrderController extends BaseController {
       setLoading(false);
       return;
     }
+
+    // --- Optimistic Update ---
+    final currentCart = cart.value;
+    bool wasRemoved = false;
+    CartItem? removedItemCopy;
+
+    if (currentCart != null) {
+      final existingItem = currentCart.items.firstWhereOrNull(
+        (e) => e.item?.id == itemId,
+      );
+      if (existingItem != null) {
+        if (existingItem.quantity > 1) {
+          existingItem.quantity -= 1;
+        } else {
+          removedItemCopy = CartItem(
+            id: existingItem.id,
+            item: existingItem.item,
+            quantity: existingItem.quantity,
+          );
+          currentCart.items.remove(existingItem);
+          wasRemoved = true;
+        }
+        cart.refresh();
+      }
+    }
+    // --------------------------
+
     final request = RemoveCartRequestModel(userId: userId, itemId: itemId);
     final result = await _addCartRepo.removeOneCartItem(
       request,
@@ -226,6 +295,21 @@ class OrderController extends BaseController {
 
     result.fold(
       (fail) {
+        // --- Revert Optimistic Update ---
+        if (currentCart != null) {
+          if (wasRemoved && removedItemCopy != null) {
+             currentCart.items.add(removedItemCopy);
+          } else {
+             final existingItem = currentCart.items.firstWhereOrNull(
+               (e) => e.item?.id == itemId,
+             );
+             if (existingItem != null) {
+                existingItem.quantity += 1;
+             }
+          }
+          cart.refresh();
+        }
+        // --------------------------------
         setError(fail.message);
         DPrint.log("Favorite success result : ${fail.message}");
         setLoading(false);
