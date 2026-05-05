@@ -29,6 +29,12 @@ class HomeController extends BaseController {
       Rxn<GetPopularItemResponseModel>();
   final selectedDay = 'Today'.obs;
 
+  // Pagination for All Popular Items
+  int _currentPage = 1;
+  final int _limit = 10;
+  final RxBool hasMoreData = true.obs;
+  final RxBool isLoadMore = false.obs;
+
 
   Future<void> fetchPopularItem(String day) async {
     if (day == 'sat' || day == 'sun') {
@@ -58,10 +64,20 @@ class HomeController extends BaseController {
     setLoading(false);
   }
 
-  Future<void> fetchAllPopularItem() async {
-    setLoading(true); // optional: use if BaseController has setLoading
+  Future<void> fetchAllPopularItem({bool isRefresh = true}) async {
+    if (isRefresh) {
+      _currentPage = 1;
+      hasMoreData.value = true;
+      setLoading(true);
+    } else {
+      if (!hasMoreData.value || isLoadMore.value) return;
+      isLoadMore.value = true;
+    }
 
-    final result = await _homeRepository.fetchAllPopularItems();
+    final result = await _homeRepository.fetchAllPopularItems(
+      page: _currentPage,
+      limit: _limit,
+    );
 
     result.fold(
       (fail) {
@@ -69,11 +85,34 @@ class HomeController extends BaseController {
         DPrint.log('All Popular items fetch failed: ${fail.message}');
       },
       (success) {
-        allPopularItem.value = success.data;
-        //DPrint.log('Popular items loaded: ${success.message}');
+        if (isRefresh) {
+          allPopularItem.value = success.data;
+        } else {
+          final currentItems = allPopularItem.value?.items ?? [];
+          final newItems = success.data.items;
+          
+          allPopularItem.value = GetPopularItemResponseModel(
+            total: success.data.total,
+            page: success.data.page,
+            pages: success.data.pages,
+            items: [...currentItems, ...newItems],
+          );
+        }
+
+        // Check if there are more pages
+        if (success.data.page >= success.data.pages) {
+          hasMoreData.value = false;
+        } else {
+          _currentPage++;
+        }
       },
     );
-    setLoading(false);
+
+    if (isRefresh) {
+      setLoading(false);
+    } else {
+      isLoadMore.value = false;
+    }
   }
 
   // Weekly Menu (All items)

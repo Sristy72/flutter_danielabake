@@ -35,12 +35,18 @@ class CategoryCard extends StatelessWidget {
                 fontWeight: FontWeight.w500,
               ),
             ),
+            SizedBox(height: 10,),
             Expanded(
               child: Align(
                 alignment: Alignment.bottomCenter,
-                child: Image.network(
-                  imageUrl,
-                  fit: BoxFit.contain,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(6), // adjust radius as needed
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.fill,
+                    height: 100,
+                    width: 100,
+                  ),
                 ),
               ),
             ),

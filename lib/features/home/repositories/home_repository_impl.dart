@@ -19,9 +19,9 @@ class HomeRepositoryImpl implements HomeRepository {
   }
 
   @override
-  NetworkResult<GetPopularItemResponseModel> fetchAllPopularItems() {
+  NetworkResult<GetPopularItemResponseModel> fetchAllPopularItems({int page = 1, int limit = 10}) {
     return _apiClient.get(
-      endpoint: ApiConstants.home.allPopular,
+      endpoint: ApiConstants.home.allPopular(page: page, limit: limit),
       fromJsonT: (json) =>
           GetPopularItemResponseModel.fromJson(json as Map<String, dynamic>),
     );

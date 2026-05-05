@@ -163,7 +163,22 @@ class _ChatScreenState extends State<ChatScreen> {
           else
             Obx(() {
               final admin = _msgController.admin.value;
-              if (admin == null) return const CircularProgressIndicator();
+              final error = _msgController.errorMessage.value;
+
+              if (admin == null) {
+                if (error.isNotEmpty) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Text(
+                        error,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  );
+                }
+                return const Center(child: CircularProgressIndicator());
+              }
 
               return GestureDetector(
                 onTap: () {

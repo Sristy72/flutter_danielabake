@@ -19,19 +19,36 @@ class AllPopularItems extends StatefulWidget {
 
 class _AllPopularItemsState extends State<AllPopularItems> {
   final _homeController = Get.find<HomeController>();
-  final _favoriteFoodController = Get.find<FavoriteFoodController>();
   final _cartController = Get.find<OrderController>();
 
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   final RxBool _isSearching = false.obs;
   final RxBool _isSearchExpanded = false.obs;
 
   @override
   void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _homeController.fetchAllPopularItem();
     });
-    super.initState();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      if (!_isSearching.value) {
+        _homeController.fetchAllPopularItem(isRefresh: false);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -125,19 +142,19 @@ class _AllPopularItemsState extends State<AllPopularItems> {
             );
           }
 
-          return GridView.builder(
-            // padding: EdgeInsets.symmetric(
-            //   vertical: screenH * 0.015,
-            // ),
-            // shrinkWrap: true,
-            // physics: const BouncingScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: gridCount,
-              mainAxisExtent: 255,
-              crossAxisSpacing: width * 0.025,
-              mainAxisSpacing: width * 0.025,
-            ),
-            itemCount: items.length,
+          return Column(
+            children: [
+              Expanded(
+                child: GridView.builder(
+                  controller: _scrollController,
+                  //padding: const EdgeInsets.all(16),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: gridCount,
+                    mainAxisExtent: 255,
+                    crossAxisSpacing: width * 0.025,
+                    mainAxisSpacing: width * 0.025,
+                  ),
+                  itemCount: items.length,
             itemBuilder: (_, index) {
               final item = items[index];
               final isFav = false.obs;
@@ -193,6 +210,14 @@ class _AllPopularItemsState extends State<AllPopularItems> {
                 ),
               );
             },
+          ),
+        ),
+              if (_homeController.isLoadMore.value)
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+            ],
           );
         }),
       ),

@@ -60,7 +60,7 @@ class AllCategoryScreen extends StatelessWidget {
               child: GridView.builder(
                 itemCount: categories.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,       // must remain 4
+                    crossAxisCount: 3,       // must remain 4
                     childAspectRatio: 0.7,  // makes cards bigger vertically
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,

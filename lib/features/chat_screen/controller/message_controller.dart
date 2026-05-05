@@ -127,7 +127,9 @@ class MessageController extends BaseController {
       },
           (success) {
             messages.assignAll(success.data);
-            DPrint.log("Last message : ${success.data.last.text}");
+            if (success.data.isNotEmpty) {
+              DPrint.log("Last message : ${success.data.last.text}");
+            }
       },
     );
   }
@@ -150,10 +152,11 @@ class MessageController extends BaseController {
         setLoading(false);
       },
           (success) {
-            final conversationId = success.data.first.id;
+            if (success.data.isNotEmpty) {
+              final conversationId = success.data.first.id;
+              DPrint.log("Message sent success, conversation id: $conversationId");
+            }
             messages.add(optimisticMessage);
-
-            DPrint.log("Register success result : ${success.data.first.id}");
       },
     );
   }
@@ -170,8 +173,13 @@ class MessageController extends BaseController {
         DPrint.log('Fetch Cart failed');
       },
           (success) {
-        admin.value = success.data.first;
-        DPrint.log(success.message);
+        if (success.data.isNotEmpty) {
+          admin.value = success.data.first;
+          DPrint.log(success.message);
+        } else {
+          DPrint.log("No admin users found");
+          setError("No admin users found");
+        }
       },
     );
   }

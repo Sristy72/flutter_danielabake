@@ -83,7 +83,7 @@ class HomeEndpoints {
   final String favorite = '${ApiConstants.baseUrl}/favorites';
   final String removeFavorite = '${ApiConstants.baseUrl}/favorites';
   String popular(String day) => '${ApiConstants.baseUrl}/items?day=$day';
-  final String allPopular = '${ApiConstants.baseUrl}/items';
+  String allPopular({int page = 1, int limit = 10}) => '${ApiConstants.baseUrl}/items?page=$page&limit=$limit';
   final String addCart = '${ApiConstants.baseUrl}/cart/add';
   final String removeCart = '${ApiConstants.baseUrl}/cart/remove';
   final String removeOneCart = '${ApiConstants.baseUrl}/cart/reduce';
