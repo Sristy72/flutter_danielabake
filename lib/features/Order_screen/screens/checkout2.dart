@@ -364,7 +364,12 @@ class _Checkout2ScreenState extends State<Checkout2Screen> {
                               child: TextFormField(
                                 controller: addressController,
                                 enabled: true,
-                                validator: Validators.addressAndCity,
+                                  validator: (value) {
+                                    if (value == null || value.trim().isEmpty) {
+                                      return 'Address and city required';
+                                    }
+                                    return null;
+                                  },
                                 decoration: const InputDecoration(
                                   hintText: "Enter address and city",
                                   hintStyle: TextStyle(color: Colors.grey),
