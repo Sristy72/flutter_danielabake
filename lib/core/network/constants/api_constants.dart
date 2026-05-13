@@ -76,8 +76,8 @@ class ProfileEndpoints {
 
 class HomeEndpoints {
   final String category = '${ApiConstants.baseUrl}/categories';
-  String items(String categoryId) =>
-      '${ApiConstants.baseUrl}/items?category=$categoryId';
+  String items(String categoryId, {int page = 1, int limit = 10}) =>
+      '${ApiConstants.baseUrl}/items?category=$categoryId&page=$page&limit=$limit';
   String searchItem(String text) =>
       '${ApiConstants.baseUrl}/items?search=$text';
   final String favorite = '${ApiConstants.baseUrl}/favorites';

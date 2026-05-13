@@ -30,8 +30,14 @@ class _FoodListScreenState extends State<FoodListScreen> {
   final controller = Get.put(CategoryController());
   // create controller if not exists
   @override
+  void initState() {
+    super.initState();
+    controller.fetchItems(widget.categoryId);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    controller.fetchItems(widget.categoryId); // fetch API
+    // fetch API removed from here to prevent repeated calls on rebuild
 
     final size = MediaQuery.sizeOf(context);
     final width = size.width;

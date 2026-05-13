@@ -22,9 +22,9 @@ class CategoryRepositoryImpl implements CategoryRepository {
   }
 
   @override
-  NetworkResult<GetItemByCategoryIdResponseModel> fetchSpecificItem(String categoryId){
+  NetworkResult<GetItemByCategoryIdResponseModel> fetchSpecificItem(String categoryId, {int page = 1, int limit = 10}){
     return _apiClient.get(
-      endpoint: ApiConstants.home.items(categoryId),
+      endpoint: ApiConstants.home.items(categoryId, page: page, limit: limit),
       fromJsonT: (json) => GetItemByCategoryIdResponseModel.fromJson(json as Map<String, dynamic>),
     );
   }

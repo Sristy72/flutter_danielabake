@@ -38,8 +38,8 @@ class CategoryController extends BaseController {
     );
   }
 
-  Future<void> fetchItems(String categoryId) async {
-    final result = await _categoryRepository.fetchSpecificItem(categoryId);
+  Future<void> fetchItems(String categoryId, {int limit = 100}) async {
+    final result = await _categoryRepository.fetchSpecificItem(categoryId, limit: limit);
 
     result.fold(
       (fail) {

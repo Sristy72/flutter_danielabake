@@ -7,5 +7,5 @@ import '../models/response/get_category_response_model.dart';
 
 abstract class CategoryRepository {
   NetworkResult<GetCategoryResponseModel> fetchCategory();
-  NetworkResult<GetItemByCategoryIdResponseModel> fetchSpecificItem(String categoryId);
+  NetworkResult<GetItemByCategoryIdResponseModel> fetchSpecificItem(String categoryId, {int page = 1, int limit = 10});
 }
