@@ -66,7 +66,14 @@ class ProfileController extends BaseController {
       isGuest.value = false;
     }
 
-    final result = await _profileRepository.deleteProfile(userId);
+    final token = await _authStorageService.getAccessToken();
+    if (token == null || token.isEmpty) {
+      setError('Session expired. Please log in again.');
+      setLoading(false);
+      return;
+    }
+
+    final result = await _profileRepository.deleteProfile(userId, token);
 
     result.fold(
       (fail) {

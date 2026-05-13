@@ -69,9 +69,11 @@ NetworkResult<List<GetFavoriteItemsResponseModel>> fetchFavoriteItems(String use
   }
 
 
-  NetworkResult<void> deleteProfile(String userId){
+  @override
+  NetworkResult<void> deleteProfile(String userId, String token){
     return _apiClient.delete(
       endpoint:ApiConstants.profile.deleteProfile(userId),
+      options: Options(headers: ApiConstants.authHeaders(token)),
       fromJsonT: (json) => [],
     );
   }

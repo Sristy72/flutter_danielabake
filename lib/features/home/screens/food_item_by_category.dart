@@ -32,12 +32,14 @@ class _FoodListScreenState extends State<FoodListScreen> {
   @override
   void initState() {
     super.initState();
-    controller.fetchItems(widget.categoryId);
+    // Fetch items with a high limit to show all available items
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.fetchItems(widget.categoryId, limit: 1000);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // fetch API removed from here to prevent repeated calls on rebuild
 
     final size = MediaQuery.sizeOf(context);
     final width = size.width;
