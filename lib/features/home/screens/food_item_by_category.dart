@@ -119,7 +119,7 @@ class _FoodListScreenState extends State<FoodListScreen> {
                     try {
                       final success = await _cartController.addCart(food.id, 1);
                       if (success) {
-                        Get.snackbar('Success', '${food.name} added to cart');
+                        //Get.snackbar('Success', '${food.name} added to cart');
                       }
                     } catch (e) {
                       Get.snackbar(

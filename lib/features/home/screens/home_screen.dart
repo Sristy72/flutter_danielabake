@@ -281,14 +281,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               1,
                             );
                             if (success) {
-                              Get.snackbar(
-                                'Success',
-                                '${item.name} added to cart',
-                                backgroundColor: Colors.green,
-                                colorText: Colors.white,
-                                margin: const EdgeInsets.all(12),
-                                duration: const Duration(seconds: 2),
-                              );
+                              // Get.snackbar(
+                              //   'Success',
+                              //   '${item.name} added to cart',
+                              //   backgroundColor: Colors.green,
+                              //   colorText: Colors.white,
+                              //   margin: const EdgeInsets.all(12),
+                              //   duration: const Duration(seconds: 2),
+                              // );
                             }
                           } catch (e) {
                             Get.snackbar(

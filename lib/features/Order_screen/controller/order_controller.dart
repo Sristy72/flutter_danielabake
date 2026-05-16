@@ -182,15 +182,15 @@ class OrderController extends BaseController {
       DPrint.log("Retrying pending cart item: $_pendingItemId");
       final success = await addCart(_pendingItemId!, _pendingItemQuantity!);
       if (success) {
-        Get.snackbar(
-          "Success",
-          "Pending item added to cart",
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-          margin: const EdgeInsets.all(12),
-          duration: const Duration(seconds: 2),
-        );
+        // Get.snackbar(
+        //   "Success",
+        //   "Pending item added to cart",
+        //   backgroundColor: Colors.green,
+        //   colorText: Colors.white,
+        //   snackPosition: SnackPosition.BOTTOM,
+        //   margin: const EdgeInsets.all(12),
+        //   duration: const Duration(seconds: 2),
+        // );
       }
       // Clear after retry (successful or not to prevent infinite loops/stale data)
       _pendingItemId = null;
@@ -215,14 +215,14 @@ class OrderController extends BaseController {
         currentCart.items.removeWhere((e) => e.item?.id == itemId);
         cart.refresh(); // This triggers instant rebuild in Obx(() => CartItemCard)
 
-        Get.snackbar(
-          "Removed",
-          "Item removed from cart",
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-          duration: const Duration(seconds: 2),
-        );
+        // Get.snackbar(
+        //   "Removed",
+        //   "Item removed from cart",
+        //   backgroundColor: Colors.red,
+        //   colorText: Colors.white,
+        //   snackPosition: SnackPosition.BOTTOM,
+        //   duration: const Duration(seconds: 2),
+        // );
       }
     }
 
@@ -233,12 +233,12 @@ class OrderController extends BaseController {
     result.fold(
       (fail) {
         // API FAILED → Show error + restore item (optional but safe)
-        Get.snackbar(
-          "Failed",
-          "Could not remove item. Try again.",
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
+        // Get.snackbar(
+        //   "Failed",
+        //   "Could not remove item. Try again.",
+        //   backgroundColor: Colors.red,
+        //   colorText: Colors.white,
+        // );
 
         // Optional: Restore the item if API failed
         // await fetchCart(); // safest way to sync
@@ -317,13 +317,13 @@ class OrderController extends BaseController {
       (success) async {
         DPrint.log("Favorite success result : ${success.message}");
         await fetchCart();
-        Get.snackbar(
-          "Removed",
-          "Item removed from cart",
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        // Get.snackbar(
+        //   "Removed",
+        //   "Item removed from cart",
+        //   backgroundColor: Colors.red,
+        //   colorText: Colors.white,
+        //   snackPosition: SnackPosition.BOTTOM,
+        // );
         setLoading(false);
       },
     );
@@ -415,11 +415,11 @@ class OrderController extends BaseController {
       },
       (success) {
         DPrint.log("Place order result : ${success.data.id}");
-        Get.snackbar(
-          "Success",
-          "Item added to the cart",
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        // Get.snackbar(
+        //   "Success",
+        //   "Item added to the cart",
+        //   snackPosition: SnackPosition.BOTTOM,
+        // );
         Get.offAll(() => NavigationMenu());
       },
     );

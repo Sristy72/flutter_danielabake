@@ -62,13 +62,13 @@ class FavoriteFoodController extends BaseController {
       },
       (success) {
         DPrint.log("Favorite success result : ${success.data.id}");
-        Get.snackbar(
-          "Success",
-          "Item added to favorites",
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        // Get.snackbar(
+        //   "Success",
+        //   "Item added to favorites",
+        //   backgroundColor: Colors.green,
+        //   colorText: Colors.white,
+        //   snackPosition: SnackPosition.BOTTOM,
+        // );
         return true; // Return true on success
       },
     );
@@ -118,13 +118,13 @@ class FavoriteFoodController extends BaseController {
         favoriteItems.removeWhere((entry) => entry.item?.id == itemId);
         favoriteItems.refresh();
 
-        Get.snackbar(
-          "Removed",
-          "Item removed from favorites",
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-          snackPosition: SnackPosition.BOTTOM,
-        );
+        // Get.snackbar(
+        //   "Removed",
+        //   "Item removed from favorites",
+        //   backgroundColor: Colors.red,
+        //   colorText: Colors.white,
+        //   snackPosition: SnackPosition.BOTTOM,
+        // );
         return true;
       },
     );

@@ -42,7 +42,7 @@ class _OrderScreensState extends State<OrderScreens> {
       body: Column(
         children: [
 
-          Text('You can\'t order for today and Cannot place order for tomorrow after 11:00am', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Color(0xFF7F3615)),),
+          Text('We kindly require a minimum of two days\' notice for all orders', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Color(0xFF7F3615)),),
           // Cart Items Section
           Expanded(
             child: Obx(() {

@@ -188,15 +188,15 @@ class _AllPopularItemsState extends State<AllPopularItems> {
                     try {
                       final success = await _cartController.addCart(item.id, 1);
                       if (success) {
-                        Get.snackbar(
-                          "Success",
-                          '${item.name} added to cart',
-                          backgroundColor: Colors.green,
-                          colorText: Colors.white,
-                          snackPosition: SnackPosition.BOTTOM,
-                          margin: const EdgeInsets.all(12),
-                          duration: const Duration(seconds: 2),
-                        );
+                        // Get.snackbar(
+                        //   "Success",
+                        //   '${item.name} added to cart',
+                        //   backgroundColor: Colors.green,
+                        //   colorText: Colors.white,
+                        //   snackPosition: SnackPosition.BOTTOM,
+                        //   margin: const EdgeInsets.all(12),
+                        //   duration: const Duration(seconds: 2),
+                        // );
                       }
                     } catch (e) {
                       Get.snackbar('Error', 'Failed to add ${item.name}');
