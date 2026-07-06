@@ -30,7 +30,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       removePadding: true,
       appBar: AppBar(
         title: const Text(
-          'Checkout',
+          'Continue',
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.w500,

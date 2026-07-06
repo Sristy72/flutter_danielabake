@@ -30,7 +30,7 @@ class _OrderScreensState extends State<OrderScreens> {
     return AppScaffold(
       appBar: AppBar(
         title: const Text(
-          'My Cart',
+          'Review Order',
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.w500,
