@@ -59,7 +59,7 @@ class FoodCard extends StatelessWidget {
                   imagePath,
                   height: 140,
                   width: double.infinity,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                 ),
               ),
               // Positioned(
